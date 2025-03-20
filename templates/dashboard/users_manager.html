@@ -1,0 +1,475 @@
+{% extends "dashboard/base.html" %}
+{% load static %}
+
+{% block dashboard_title %}إدارة المستخدمين{% endblock %}
+
+{% block dashboard_actions %}
+<div class="btn-group me-2">
+    <button type="button" class="btn btn-sm btn-outline-primary" data-bs-toggle="modal" data-bs-target="#addUserModal">
+        <i class="fas fa-user-plus me-1"></i> إضافة مستخدم
+    </button>
+    <button type="button" class="btn btn-sm btn-outline-primary" data-bs-toggle="modal" data-bs-target="#addTeamMemberModal">
+        <i class="fas fa-users me-1"></i> إضافة عضو فريق
+    </button>
+</div>
+{% endblock %}
+
+{% block dashboard_content %}
+<!-- أقسام إدارة المستخدمين -->
+<div class="row">
+    <div class="col-12 mb-4">
+        <ul class="nav nav-tabs" id="usersTab" role="tablist">
+            <li class="nav-item" role="presentation">
+                <button class="nav-link active" id="admin-users-tab" data-bs-toggle="tab" data-bs-target="#admin-users" type="button" role="tab" aria-controls="admin-users" aria-selected="true">
+                    <i class="fas fa-user-shield me-1"></i> مستخدمي النظام
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="team-members-tab" data-bs-toggle="tab" data-bs-target="#team-members" type="button" role="tab" aria-controls="team-members" aria-selected="false">
+                    <i class="fas fa-users me-1"></i> فريق العمل
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="activity-log-tab" data-bs-toggle="tab" data-bs-target="#activity-log" type="button" role="tab" aria-controls="activity-log" aria-selected="false">
+                    <i class="fas fa-history me-1"></i> سجل النشاطات
+                </button>
+            </li>
+        </ul>
+        
+        <div class="tab-content border border-top-0 rounded-bottom p-3 bg-white" id="usersTabContent">
+            <!-- قسم مستخدمي النظام -->
+            <div class="tab-pane fade show active" id="admin-users" role="tabpanel" aria-labelledby="admin-users-tab">
+                <div class="d-flex justify-content-between mb-3">
+                    <h5>مستخدمي لوحة التحكم</h5>
+                    <div class="input-group w-50">
+                        <input type="text" class="form-control form-control-sm" placeholder="بحث عن مستخدم...">
+                        <button class="btn btn-sm btn-outline-secondary" type="button">
+                            <i class="fas fa-search"></i>
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="table-responsive">
+                    <table class="table table-hover table-striped align-middle">
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>الصورة</th>
+                                <th>اسم المستخدم</th>
+                                <th>البريد الإلكتروني</th>
+                                <th>الاسم الكامل</th>
+                                <th>الصلاحيات</th>
+                                <th>آخر تسجيل دخول</th>
+                                <th>الحالة</th>
+                                <th>الإجراءات</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% if users %}
+                                {% for user in users %}
+                                <tr>
+                                    <td>{{ forloop.counter }}</td>
+                                    <td>
+                                        {% if user.profile.image %}
+                                        <img src="{{ user.profile.image.url }}" alt="{{ user.username }}" width="40" height="40" class="rounded-circle">
+                                        {% else %}
+                                        <div class="bg-primary rounded-circle d-flex align-items-center justify-content-center text-white" style="width: 40px; height: 40px;">
+                                            {{ user.first_name|first|upper }}{{ user.last_name|first|upper }}
+                                        </div>
+                                        {% endif %}
+                                    </td>
+                                    <td>{{ user.username }}</td>
+                                    <td>{{ user.email }}</td>
+                                    <td>{{ user.get_full_name }}</td>
+                                    <td>
+                                        {% if user.is_superuser %}
+                                        <span class="badge bg-danger">مدير النظام</span>
+                                        {% elif user.is_staff %}
+                                        <span class="badge bg-primary">مشرف</span>
+                                        {% else %}
+                                        <span class="badge bg-secondary">مستخدم</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>{{ user.last_login|date:"Y/m/d H:i" }}</td>
+                                    <td>
+                                        {% if user.is_active %}
+                                        <span class="badge bg-success">نشط</span>
+                                        {% else %}
+                                        <span class="badge bg-danger">معطل</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        <div class="btn-group btn-group-sm">
+                                            <a href="#" class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#editUserModal{{ user.id }}"><i class="fas fa-edit"></i></a>
+                                            <a href="#" class="btn btn-outline-warning" data-bs-toggle="modal" data-bs-target="#resetPasswordModal{{ user.id }}"><i class="fas fa-key"></i></a>
+                                            <button class="btn btn-outline-danger" type="button" data-bs-toggle="modal" data-bs-target="#deleteUserModal{{ user.id }}"><i class="fas fa-trash"></i></button>
+                                        </div>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            {% else %}
+                                <tr>
+                                    <td colspan="9" class="text-center py-4">
+                                        <p class="text-muted mb-0">لا يوجد مستخدمين</p>
+                                        <button class="btn btn-sm btn-primary mt-2" data-bs-toggle="modal" data-bs-target="#addUserModal">
+                                            <i class="fas fa-user-plus me-1"></i> إضافة مستخدم جديد
+                                        </button>
+                                    </td>
+                                </tr>
+                            {% endif %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            
+            <!-- قسم فريق العمل -->
+            <div class="tab-pane fade" id="team-members" role="tabpanel" aria-labelledby="team-members-tab">
+                <div class="d-flex justify-content-between mb-3">
+                    <h5>فريق العمل</h5>
+                    <div class="input-group w-50">
+                        <input type="text" class="form-control form-control-sm" placeholder="بحث عن عضو...">
+                        <button class="btn btn-sm btn-outline-secondary" type="button">
+                            <i class="fas fa-search"></i>
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="row g-3">
+                    {% if team_members %}
+                        {% for member in team_members %}
+                        <div class="col-md-6 col-lg-4 col-xl-3">
+                            <div class="card team-card h-100">
+                                <div class="team-img-container">
+                                    {% if member.image %}
+                                    <img src="{{ member.image.url }}" class="card-img-top" alt="{{ member.name }}" style="height: 200px; object-fit: cover;">
+                                    {% else %}
+                                    <div class="bg-light d-flex align-items-center justify-content-center" style="height: 200px;">
+                                        <i class="fas fa-user fa-3x text-secondary"></i>
+                                    </div>
+                                    {% endif %}
+                                    <div class="team-actions">
+                                        <div class="btn-group btn-group-sm">
+                                            <a href="#" class="btn btn-light"><i class="fas fa-edit"></i></a>
+                                            <a href="#" class="btn btn-light"><i class="fas fa-trash text-danger"></i></a>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="card-body text-center">
+                                    <h5 class="card-title">{{ member.name }}</h5>
+                                    <p class="card-text text-primary fw-bold">{{ member.position }}</p>
+                                    <p class="card-text small">{{ member.bio|truncatechars:100 }}</p>
+                                    <div class="social-links mt-3">
+                                        {% if member.linkedin %}
+                                        <a href="{{ member.linkedin }}" target="_blank"><i class="fab fa-linkedin"></i></a>
+                                        {% endif %}
+                                        {% if member.twitter %}
+                                        <a href="{{ member.twitter }}" target="_blank"><i class="fab fa-twitter"></i></a>
+                                        {% endif %}
+                                        {% if member.email %}
+                                        <a href="mailto:{{ member.email }}"><i class="fas fa-envelope"></i></a>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                                <div class="card-footer bg-white d-flex justify-content-between align-items-center">
+                                    <small class="text-muted">{{ member.department }}</small>
+                                    <div class="form-check form-switch">
+                                        <input class="form-check-input" type="checkbox" id="showMember{{ member.id }}" {% if member.is_visible %}checked{% endif %}>
+                                        <label class="form-check-label small" for="showMember{{ member.id }}">عرض في الموقع</label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    {% else %}
+                        <div class="col-12 text-center py-4">
+                            <p class="text-muted mb-3">لا يوجد أعضاء في فريق العمل</p>
+                            <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addTeamMemberModal">
+                                <i class="fas fa-users me-1"></i> إضافة عضو جديد
+                            </button>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+            
+            <!-- قسم سجل النشاطات -->
+            <div class="tab-pane fade" id="activity-log" role="tabpanel" aria-labelledby="activity-log-tab">
+                <div class="d-flex justify-content-between mb-3">
+                    <h5>سجل نشاطات المستخدمين</h5>
+                    <div class="input-group w-50">
+                        <input type="text" class="form-control form-control-sm" placeholder="بحث في السجل...">
+                        <button class="btn btn-sm btn-outline-secondary" type="button">
+                            <i class="fas fa-search"></i>
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="activity-timeline">
+                    {% if activities %}
+                        {% for activity in activities %}
+                        <div class="activity-item">
+                            <div class="activity-dot 
+                                {% if activity.action_type == 'create' %}bg-success{% elif activity.action_type == 'update' %}bg-primary{% elif activity.action_type == 'delete' %}bg-danger{% else %}bg-secondary{% endif %}">
+                            </div>
+                            <div class="activity-content">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <h6>{{ activity.user.get_full_name }} ({{ activity.user.username }})</h6>
+                                    <small class="text-muted">{{ activity.timestamp|date:"Y/m/d H:i" }}</small>
+                                </div>
+                                <p class="mb-1">{{ activity.description }}</p>
+                                <small class="badge 
+                                    {% if activity.action_type == 'create' %}bg-success{% elif activity.action_type == 'update' %}bg-primary{% elif activity.action_type == 'delete' %}bg-danger{% else %}bg-secondary{% endif %}">
+                                    {{ activity.get_action_type_display }}
+                                </small>
+                                <small class="text-muted">{{ activity.model_name }}</small>
+                                {% if activity.ip_address %}
+                                <small class="text-muted">IP: {{ activity.ip_address }}</small>
+                                {% endif %}
+                            </div>
+                        </div>
+                        {% endfor %}
+                    {% else %}
+                        <div class="text-center py-4">
+                            <p class="text-muted mb-0">لا توجد سجلات للنشاطات</p>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- النماذج المنبثقة -->
+<!-- نموذج إضافة مستخدم -->
+<div class="modal fade" id="addUserModal" tabindex="-1" aria-labelledby="addUserModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="addUserModalLabel">إضافة مستخدم جديد</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form action="#" method="post" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label for="username" class="form-label">اسم المستخدم</label>
+                            <input type="text" class="form-control" id="username" name="username" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="email" class="form-label">البريد الإلكتروني</label>
+                            <input type="email" class="form-control" id="email" name="email" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="first_name" class="form-label">الاسم الأول</label>
+                            <input type="text" class="form-control" id="first_name" name="first_name" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="last_name" class="form-label">الاسم الأخير</label>
+                            <input type="text" class="form-control" id="last_name" name="last_name">
+                        </div>
+                        <div class="col-md-6">
+                            <label for="password" class="form-label">كلمة المرور</label>
+                            <input type="password" class="form-control" id="password" name="password" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="password_confirm" class="form-label">تأكيد كلمة المرور</label>
+                            <input type="password" class="form-control" id="password_confirm" name="password_confirm" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="user_permissions" class="form-label">الصلاحيات</label>
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="is_staff" name="is_staff">
+                                <label class="form-check-label" for="is_staff">مشرف</label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="is_superuser" name="is_superuser">
+                                <label class="form-check-label" for="is_superuser">مدير النظام</label>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="profile_image" class="form-label">صورة المستخدم</label>
+                            <input type="file" class="form-control" id="profile_image" name="profile_image">
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">إلغاء</button>
+                <button type="button" class="btn btn-primary">حفظ</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- نموذج إضافة عضو فريق -->
+<div class="modal fade" id="addTeamMemberModal" tabindex="-1" aria-labelledby="addTeamMemberModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="addTeamMemberModalLabel">إضافة عضو فريق جديد</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form action="#" method="post" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label for="member_name" class="form-label">الاسم الكامل</label>
+                            <input type="text" class="form-control" id="member_name" name="name" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="member_position" class="form-label">المنصب</label>
+                            <input type="text" class="form-control" id="member_position" name="position" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="member_department" class="form-label">القسم</label>
+                            <input type="text" class="form-control" id="member_department" name="department">
+                        </div>
+                        <div class="col-md-6">
+                            <label for="member_order" class="form-label">الترتيب</label>
+                            <input type="number" class="form-control" id="member_order" name="order" value="0">
+                        </div>
+                        <div class="col-12">
+                            <label for="member_bio" class="form-label">نبذة</label>
+                            <textarea class="form-control" id="member_bio" name="bio" rows="3"></textarea>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="member_image" class="form-label">الصورة الشخصية</label>
+                            <input type="file" class="form-control" id="member_image" name="image">
+                        </div>
+                        <div class="col-md-6">
+                            <label for="member_email" class="form-label">البريد الإلكتروني</label>
+                            <input type="email" class="form-control" id="member_email" name="email">
+                        </div>
+                        <div class="col-md-6">
+                            <label for="member_linkedin" class="form-label">LinkedIn</label>
+                            <input type="url" class="form-control" id="member_linkedin" name="linkedin">
+                        </div>
+                        <div class="col-md-6">
+                            <label for="member_twitter" class="form-label">Twitter</label>
+                            <input type="url" class="form-control" id="member_twitter" name="twitter">
+                        </div>
+                        <div class="col-12">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="member_visible" name="is_visible" checked>
+                                <label class="form-check-label" for="member_visible">
+                                    عرض في موقع الشركة
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">إلغاء</button>
+                <button type="button" class="btn btn-primary">حفظ</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+{{ block.super }}
+<style>
+    .team-card {
+        transition: all 0.3s ease;
+        border-radius: var(--border-radius);
+        overflow: hidden;
+    }
+    
+    .team-card:hover {
+        transform: translateY(-5px);
+        box-shadow: var(--box-shadow-md);
+    }
+    
+    .team-img-container {
+        position: relative;
+    }
+    
+    .team-actions {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background-color: rgba(0,0,0,0.5);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        opacity: 0;
+        transition: opacity 0.3s ease;
+    }
+    
+    .team-img-container:hover .team-actions {
+        opacity: 1;
+    }
+    
+    .social-links a {
+        display: inline-block;
+        width: 35px;
+        height: 35px;
+        line-height: 35px;
+        text-align: center;
+        background-color: var(--light-bg);
+        border-radius: 50%;
+        color: var(--primary-color);
+        margin: 0 5px;
+        transition: var(--transition);
+    }
+    
+    .social-links a:hover {
+        background-color: var(--primary-color);
+        color: white;
+        transform: translateY(-3px);
+    }
+    
+    .activity-timeline {
+        position: relative;
+        padding: 30px 0;
+    }
+    
+    .activity-timeline::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        bottom: 0;
+        right: 15px;
+        width: 3px;
+        background-color: var(--light-bg);
+        border-radius: 3px;
+    }
+    
+    .activity-item {
+        position: relative;
+        padding-right: 40px;
+        margin-bottom: 30px;
+    }
+    
+    .activity-dot {
+        position: absolute;
+        right: 7.5px;
+        top: 10px;
+        width: 18px;
+        height: 18px;
+        border-radius: 50%;
+        background-color: var(--primary-color);
+        z-index: 1;
+        border: 3px solid white;
+        box-shadow: 0 0 0 2px rgba(0,0,0,0.1);
+    }
+    
+    .activity-content {
+        padding: 15px;
+        background-color: white;
+        border-radius: var(--border-radius);
+        box-shadow: var(--box-shadow);
+        transition: transform 0.3s ease;
+    }
+    
+    .activity-content:hover {
+        transform: translateY(-3px);
+        box-shadow: var(--box-shadow-md);
+    }
+</style>
+{% endblock %} 

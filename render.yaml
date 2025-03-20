@@ -1,0 +1,17 @@
+   services:
+     - type: web
+       name: alsanea
+       env: python
+       buildCommand: ./build.sh
+       startCommand: gunicorn alsanea.wsgi:application
+       envVars:
+         - key: DJANGO_SECRET_KEY
+           generateValue: true
+         - key: DJANGO_DEBUG
+           value: false
+         - key: DJANGO_ALLOWED_HOSTS
+           value: ".onrender.com"
+       disk:
+         name: data
+         mountPath: /data
+         sizeGB: 1

@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>نمط عربي إسلامي - Arabic Pattern Creator</title>
+    <style>
+        body {
+            text-align: center;
+            font-family: Arial, sans-serif;
+            background-color: #f5f5f5;
+            margin: 0;
+            padding: 20px;
+            direction: rtl;
+        }
+        
+        h1 {
+            color: #0D5661;
+        }
+        
+        canvas {
+            border: 1px solid #ccc;
+            max-width: 100%;
+            background-color: white;
+            margin: 20px auto;
+            display: block;
+        }
+        
+        .instructions {
+            margin: 20px auto;
+            max-width: 600px;
+            text-align: right;
+            background-color: #fff;
+            padding: 15px;
+            border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+        
+        .button {
+            background-color: #0D5661;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+            border-radius: 4px;
+            margin: 10px;
+        }
+        
+        .button:hover {
+            background-color: #0a444d;
+        }
+    </style>
+</head>
+<body>
+    <h1>إنشاء نمط عربي إسلامي</h1>
+    
+    <div class="instructions">
+        <p>هذه الصفحة تقوم بإنشاء نمط هندسي إسلامي بسيط مناسب للخلفيات. لحفظ الصورة:</p>
+        <ol>
+            <li>انقر على زر "إنشاء النمط" لتوليد النمط</li>
+            <li>انقر على زر "حفظ الصورة" لتنزيل الصورة كملف PNG</li>
+            <li>ضع الصورة في مجلد static/images/patterns باسم pattern.png</li>
+        </ol>
+    </div>
+    
+    <button class="button" id="generatePattern">إنشاء النمط</button>
+    <button class="button" id="saveImage">حفظ الصورة</button>
+    
+    <canvas id="patternCanvas" width="300" height="300"></canvas>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const canvas = document.getElementById('patternCanvas');
+            const ctx = canvas.getContext('2d');
+            
+            // Colors from our theme
+            const primaryColor = '#0D5661';
+            const secondaryColor = '#D4AF37';
+            const accentColor = '#903749';
+            
+            function drawIslamicPattern() {
+                // Clear the canvas
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                
+                // Set background
+                ctx.fillStyle = '#fafafa';
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+                
+                // Parameters for the pattern
+                const size = 20;
+                const rows = Math.ceil(canvas.height / size);
+                const cols = Math.ceil(canvas.width / size);
+                
+                // Drawing the geometric pattern
+                for (let row = 0; row < rows; row++) {
+                    for (let col = 0; col < cols; col++) {
+                        const x = col * size;
+                        const y = row * size;
+                        
+                        // Create a subtle pattern
+                        if ((row + col) % 3 === 0) {
+                            // Star pattern
+                            ctx.beginPath();
+                            ctx.moveTo(x + size/2, y);
+                            ctx.lineTo(x + size * 0.7, y + size * 0.3);
+                            ctx.lineTo(x + size, y + size/2);
+                            ctx.lineTo(x + size * 0.7, y + size * 0.7);
+                            ctx.lineTo(x + size/2, y + size);
+                            ctx.lineTo(x + size * 0.3, y + size * 0.7);
+                            ctx.lineTo(x, y + size/2);
+                            ctx.lineTo(x + size * 0.3, y + size * 0.3);
+                            ctx.closePath();
+                            
+                            // Alternate colors
+                            if ((row * col) % 2 === 0) {
+                                ctx.fillStyle = primaryColor + '15'; // 15% opacity
+                            } else {
+                                ctx.fillStyle = secondaryColor + '15';
+                            }
+                            ctx.fill();
+                        } else if ((row + col) % 3 === 1) {
+                            // Circle pattern
+                            ctx.beginPath();
+                            ctx.arc(x + size/2, y + size/2, size/4, 0, Math.PI * 2);
+                            ctx.fillStyle = accentColor + '10';
+                            ctx.fill();
+                        } else {
+                            // Line pattern
+                            ctx.beginPath();
+                            ctx.moveTo(x, y);
+                            ctx.lineTo(x + size, y + size);
+                            ctx.strokeStyle = primaryColor + '10';
+                            ctx.lineWidth = 1;
+                            ctx.stroke();
+                            
+                            ctx.beginPath();
+                            ctx.moveTo(x + size, y);
+                            ctx.lineTo(x, y + size);
+                            ctx.strokeStyle = secondaryColor + '10';
+                            ctx.lineWidth = 1;
+                            ctx.stroke();
+                        }
+                    }
+                }
+            }
+            
+            // Generate pattern button
+            document.getElementById('generatePattern').addEventListener('click', function() {
+                drawIslamicPattern();
+            });
+            
+            // Save image button
+            document.getElementById('saveImage').addEventListener('click', function() {
+                const dataURL = canvas.toDataURL('image/png');
+                const link = document.createElement('a');
+                link.download = 'pattern.png';
+                link.href = dataURL;
+                link.click();
+            });
+            
+            // Initial pattern generation
+            drawIslamicPattern();
+        });
+    </script>
+</body>
+</html> 

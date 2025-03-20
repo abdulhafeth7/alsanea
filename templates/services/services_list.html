@@ -1,0 +1,124 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}الخدمات - شركة الصانع{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12 text-center mb-5">
+        <h2 class="display-4">خدماتنا المتميزة</h2>
+        <p class="lead">نقدم مجموعة متكاملة من الخدمات الهندسية والإنشائية بأعلى معايير الجودة</p>
+    </div>
+</div>
+
+<div class="row mb-5">
+    {% if services %}
+        {% for service in services %}
+        <div class="col-md-4 mb-4">
+            <div class="card h-100">
+                {% if service.image %}
+                <img src="{{ service.image.url }}" class="card-img-top" alt="{{ service.title }}">
+                {% else %}
+                <div class="text-center pt-4">
+                    <i class="fas fa-{{ service.icon|default:'building' }} service-icon"></i>
+                </div>
+                {% endif %}
+                <div class="card-body">
+                    <h3 class="card-title">{{ service.title }}</h3>
+                    <p class="card-text">{{ service.short_description }}</p>
+                    <a href="{% url 'services:service_detail' service.slug %}" class="btn btn-primary">تفاصيل الخدمة</a>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    {% else %}
+        <!-- خدمات افتراضية في حالة عدم وجود خدمات في قاعدة البيانات -->
+        <div class="col-md-4 mb-4">
+            <div class="card h-100">
+                <div class="text-center pt-4">
+                    <i class="fas fa-building service-icon"></i>
+                </div>
+                <div class="card-body">
+                    <h3 class="card-title">المقاولات العامة</h3>
+                    <p class="card-text">نقدم خدمات المقاولات العامة بجودة عالية وبأسعار منافسة، مع التزامنا بالجداول الزمنية المحددة للمشاريع.</p>
+                    <a href="#" class="btn btn-primary">تفاصيل الخدمة</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 mb-4">
+            <div class="card h-100">
+                <div class="text-center pt-4">
+                    <i class="fas fa-drafting-compass service-icon"></i>
+                </div>
+                <div class="card-body">
+                    <h3 class="card-title">التصميم الهندسي</h3>
+                    <p class="card-text">فريق من المهندسين المحترفين لتقديم أفضل تصاميم هندسية تلبي احتياجات عملائنا بدقة واحترافية.</p>
+                    <a href="#" class="btn btn-primary">تفاصيل الخدمة</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 mb-4">
+            <div class="card h-100">
+                <div class="text-center pt-4">
+                    <i class="fas fa-tasks service-icon"></i>
+                </div>
+                <div class="card-body">
+                    <h3 class="card-title">إدارة المشاريع</h3>
+                    <p class="card-text">نقدم خدمات إدارة المشاريع الاحترافية لضمان تنفيذ المشروع بأعلى معايير الجودة وضمن الميزانية المحددة.</p>
+                    <a href="#" class="btn btn-primary">تفاصيل الخدمة</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 mb-4">
+            <div class="card h-100">
+                <div class="text-center pt-4">
+                    <i class="fas fa-ruler-combined service-icon"></i>
+                </div>
+                <div class="card-body">
+                    <h3 class="card-title">الاستشارات الهندسية</h3>
+                    <p class="card-text">نقدم استشارات هندسية متخصصة في مجالات البناء والتشييد لمساعدتك في اتخاذ القرارات المناسبة لمشروعك.</p>
+                    <a href="#" class="btn btn-primary">تفاصيل الخدمة</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 mb-4">
+            <div class="card h-100">
+                <div class="text-center pt-4">
+                    <i class="fas fa-home service-icon"></i>
+                </div>
+                <div class="card-body">
+                    <h3 class="card-title">الديكور الداخلي</h3>
+                    <p class="card-text">نقدم خدمات تصميم وتنفيذ الديكورات الداخلية بأحدث الأساليب العصرية التي تتناسب مع ذوقك واحتياجاتك.</p>
+                    <a href="#" class="btn btn-primary">تفاصيل الخدمة</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 mb-4">
+            <div class="card h-100">
+                <div class="text-center pt-4">
+                    <i class="fas fa-solar-panel service-icon"></i>
+                </div>
+                <div class="card-body">
+                    <h3 class="card-title">الطاقة المتجددة</h3>
+                    <p class="card-text">نقدم حلول الطاقة المتجددة والمستدامة لتوفير الطاقة وتقليل التكاليف التشغيلية للمباني والمنشآت.</p>
+                    <a href="#" class="btn btn-primary">تفاصيل الخدمة</a>
+                </div>
+            </div>
+        </div>
+    {% endif %}
+</div>
+
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header bg-primary text-white">
+                <h3 class="card-title mb-0">طلب خدمة مخصصة</h3>
+            </div>
+            <div class="card-body">
+                <p>هل لديك متطلبات خاصة لا تجدها ضمن خدماتنا؟ لا تتردد في التواصل معنا لمناقشة احتياجاتك الخاصة.</p>
+                <a href="{% url 'core:contact' %}" class="btn btn-primary">تواصل معنا</a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

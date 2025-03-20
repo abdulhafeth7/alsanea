@@ -1,0 +1,168 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}لوحة التحكم - شركة الصانع{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <!-- القائمة الجانبية -->
+        <nav id="sidebar" class="col-md-3 col-lg-2 d-md-block bg-dark sidebar collapse">
+            <div class="position-sticky pt-3">
+                <ul class="nav flex-column">
+                    <li class="nav-item">
+                        <a class="nav-link {% if request.resolver_match.url_name == 'dashboard' %}active{% endif %}" href="{% url 'dashboard:dashboard' %}">
+                            <i class="fas fa-tachometer-alt me-2"></i>
+                            الرئيسية
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link {% if request.resolver_match.url_name == 'content_manager' %}active{% endif %}" href="{% url 'dashboard:content_manager' %}">
+                            <i class="fas fa-file-alt me-2"></i>
+                            إدارة المحتوى
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link {% if request.resolver_match.url_name == 'media_manager' %}active{% endif %}" href="{% url 'dashboard:media_manager' %}">
+                            <i class="fas fa-images me-2"></i>
+                            إدارة الوسائط
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link {% if request.resolver_match.url_name == 'users_manager' %}active{% endif %}" href="{% url 'dashboard:users_manager' %}">
+                            <i class="fas fa-users me-2"></i>
+                            إدارة المستخدمين
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link {% if request.resolver_match.url_name == 'settings' %}active{% endif %}" href="{% url 'dashboard:settings' %}">
+                            <i class="fas fa-cog me-2"></i>
+                            الإعدادات
+                        </a>
+                    </li>
+                </ul>
+
+                <h6 class="sidebar-heading d-flex justify-content-between align-items-center px-3 mt-4 mb-1 text-muted">
+                    <span>روابط سريعة</span>
+                </h6>
+                <ul class="nav flex-column mb-2">
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'core:home' %}" target="_blank">
+                            <i class="fas fa-external-link-alt me-2"></i>
+                            عرض الموقع
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'admin:index' %}">
+                            <i class="fas fa-cogs me-2"></i>
+                            واجهة الإدارة
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'admin:logout' %}">
+                            <i class="fas fa-sign-out-alt me-2"></i>
+                            تسجيل الخروج
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </nav>
+
+        <!-- المحتوى الرئيسي -->
+        <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
+            <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+                <h1 class="h2">{% block dashboard_title %}لوحة التحكم{% endblock %}</h1>
+                <div class="btn-toolbar mb-2 mb-md-0">
+                    {% block dashboard_actions %}{% endblock %}
+                </div>
+            </div>
+
+            {% if messages %}
+            <div id="messages">
+                {% for message in messages %}
+                <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+                {% endfor %}
+            </div>
+            {% endif %}
+
+            {% block dashboard_content %}{% endblock %}
+        </main>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+    #sidebar {
+        min-height: calc(100vh - 56px);
+        position: fixed;
+        top: 56px;
+        bottom: 0;
+        right: 0;
+    }
+    
+    #sidebar .nav-link {
+        color: #adb5bd;
+        border-radius: 0.25rem;
+        margin: 0.25rem 0;
+        padding: 0.5rem 1rem;
+    }
+    
+    #sidebar .nav-link:hover {
+        color: #fff;
+        background-color: rgba(255, 255, 255, 0.1);
+    }
+    
+    #sidebar .nav-link.active {
+        color: #fff;
+        background-color: #1d4ed8;
+    }
+    
+    main {
+        margin-right: 16.66666667%;
+    }
+    
+    @media (max-width: 767.98px) {
+        #sidebar {
+            position: static;
+            height: auto;
+        }
+        
+        main {
+            margin-right: 0;
+        }
+    }
+    
+    .sidebar-heading {
+        font-size: .75rem;
+        text-transform: uppercase;
+    }
+    
+    .dashboard-card {
+        transition: all 0.3s ease;
+    }
+    
+    .dashboard-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+    }
+</style>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // إغلاق رسائل التنبيه تلقائيًا بعد 5 ثوانٍ
+    document.addEventListener('DOMContentLoaded', function() {
+        setTimeout(function() {
+            let alerts = document.querySelectorAll('.alert');
+            alerts.forEach(function(alert) {
+                let bsAlert = new bootstrap.Alert(alert);
+                bsAlert.close();
+            });
+        }, 5000);
+    });
+</script>
+{% endblock %} 

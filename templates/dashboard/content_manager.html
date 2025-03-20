@@ -1,0 +1,422 @@
+{% extends "dashboard/base.html" %}
+{% load static %}
+
+{% block dashboard_title %}إدارة المحتوى{% endblock %}
+
+{% block dashboard_actions %}
+<div class="btn-group me-2">
+    <button type="button" class="btn btn-sm btn-outline-primary" data-bs-toggle="modal" data-bs-target="#addServiceModal">
+        <i class="fas fa-plus me-1"></i> إضافة خدمة
+    </button>
+    <button type="button" class="btn btn-sm btn-outline-primary" data-bs-toggle="modal" data-bs-target="#addProjectModal">
+        <i class="fas fa-plus me-1"></i> إضافة مشروع
+    </button>
+    <button type="button" class="btn btn-sm btn-outline-primary" data-bs-toggle="modal" data-bs-target="#addSliderModal">
+        <i class="fas fa-plus me-1"></i> إضافة شريحة
+    </button>
+</div>
+{% endblock %}
+
+{% block dashboard_content %}
+<!-- أقسام المحتوى -->
+<div class="row">
+    <div class="col-12 mb-4">
+        <ul class="nav nav-tabs" id="contentTab" role="tablist">
+            <li class="nav-item" role="presentation">
+                <button class="nav-link active" id="services-tab" data-bs-toggle="tab" data-bs-target="#services" type="button" role="tab" aria-controls="services" aria-selected="true">
+                    <i class="fas fa-cogs me-1"></i> الخدمات
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="projects-tab" data-bs-toggle="tab" data-bs-target="#projects" type="button" role="tab" aria-controls="projects" aria-selected="false">
+                    <i class="fas fa-building me-1"></i> المشاريع
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="sliders-tab" data-bs-toggle="tab" data-bs-target="#sliders" type="button" role="tab" aria-controls="sliders" aria-selected="false">
+                    <i class="fas fa-images me-1"></i> الشرائح
+                </button>
+            </li>
+        </ul>
+        
+        <div class="tab-content border border-top-0 rounded-bottom p-3 bg-white" id="contentTabContent">
+            <!-- قسم الخدمات -->
+            <div class="tab-pane fade show active" id="services" role="tabpanel" aria-labelledby="services-tab">
+                <div class="d-flex justify-content-between mb-3">
+                    <h5>قائمة الخدمات</h5>
+                    <div class="input-group w-50">
+                        <input type="text" class="form-control form-control-sm" placeholder="بحث عن خدمة...">
+                        <button class="btn btn-sm btn-outline-secondary" type="button">
+                            <i class="fas fa-search"></i>
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="table-responsive">
+                    <table class="table table-hover table-striped align-middle">
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>الصورة</th>
+                                <th>العنوان</th>
+                                <th>التصنيف</th>
+                                <th>الترتيب</th>
+                                <th>مميزة</th>
+                                <th>الإجراءات</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% if services %}
+                                {% for service in services %}
+                                <tr>
+                                    <td>{{ forloop.counter }}</td>
+                                    <td>
+                                        {% if service.image %}
+                                        <img src="{{ service.image.url }}" alt="{{ service.title }}" width="50" height="50" class="rounded">
+                                        {% else %}
+                                        <div class="bg-light rounded d-flex align-items-center justify-content-center" style="width: 50px; height: 50px;">
+                                            <i class="fas fa-cog text-secondary"></i>
+                                        </div>
+                                        {% endif %}
+                                    </td>
+                                    <td>{{ service.title }}</td>
+                                    <td>{{ service.category.name }}</td>
+                                    <td>{{ service.order }}</td>
+                                    <td>
+                                        {% if service.featured %}
+                                        <span class="badge bg-success"><i class="fas fa-check"></i></span>
+                                        {% else %}
+                                        <span class="badge bg-secondary"><i class="fas fa-times"></i></span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        <div class="btn-group btn-group-sm">
+                                            <a href="#" class="btn btn-outline-primary"><i class="fas fa-edit"></i></a>
+                                            <a href="#" class="btn btn-outline-danger"><i class="fas fa-trash"></i></a>
+                                            <a href="{% url 'services:service_detail' service.slug %}" target="_blank" class="btn btn-outline-info"><i class="fas fa-eye"></i></a>
+                                        </div>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            {% else %}
+                                <tr>
+                                    <td colspan="7" class="text-center py-4">
+                                        <p class="text-muted mb-0">لا توجد خدمات مضافة</p>
+                                        <button class="btn btn-sm btn-primary mt-2" data-bs-toggle="modal" data-bs-target="#addServiceModal">
+                                            <i class="fas fa-plus me-1"></i> إضافة خدمة جديدة
+                                        </button>
+                                    </td>
+                                </tr>
+                            {% endif %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            
+            <!-- قسم المشاريع -->
+            <div class="tab-pane fade" id="projects" role="tabpanel" aria-labelledby="projects-tab">
+                <div class="d-flex justify-content-between mb-3">
+                    <h5>قائمة المشاريع</h5>
+                    <div class="input-group w-50">
+                        <input type="text" class="form-control form-control-sm" placeholder="بحث عن مشروع...">
+                        <button class="btn btn-sm btn-outline-secondary" type="button">
+                            <i class="fas fa-search"></i>
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="table-responsive">
+                    <table class="table table-hover table-striped align-middle">
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>الصورة</th>
+                                <th>العنوان</th>
+                                <th>التصنيف</th>
+                                <th>الموقع</th>
+                                <th>تاريخ الإنجاز</th>
+                                <th>مميز</th>
+                                <th>الإجراءات</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% if projects %}
+                                {% for project in projects %}
+                                <tr>
+                                    <td>{{ forloop.counter }}</td>
+                                    <td>
+                                        {% if project.image %}
+                                        <img src="{{ project.image.url }}" alt="{{ project.title }}" width="50" height="50" class="rounded">
+                                        {% else %}
+                                        <div class="bg-light rounded d-flex align-items-center justify-content-center" style="width: 50px; height: 50px;">
+                                            <i class="fas fa-building text-secondary"></i>
+                                        </div>
+                                        {% endif %}
+                                    </td>
+                                    <td>{{ project.title }}</td>
+                                    <td>{{ project.category.name }}</td>
+                                    <td>{{ project.location.name }}</td>
+                                    <td>{{ project.completion_date|date:"Y/m/d" }}</td>
+                                    <td>
+                                        {% if project.featured %}
+                                        <span class="badge bg-success"><i class="fas fa-check"></i></span>
+                                        {% else %}
+                                        <span class="badge bg-secondary"><i class="fas fa-times"></i></span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        <div class="btn-group btn-group-sm">
+                                            <a href="#" class="btn btn-outline-primary"><i class="fas fa-edit"></i></a>
+                                            <a href="#" class="btn btn-outline-danger"><i class="fas fa-trash"></i></a>
+                                            <a href="{% url 'services:project_detail' project.slug %}" target="_blank" class="btn btn-outline-info"><i class="fas fa-eye"></i></a>
+                                        </div>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            {% else %}
+                                <tr>
+                                    <td colspan="8" class="text-center py-4">
+                                        <p class="text-muted mb-0">لا توجد مشاريع مضافة</p>
+                                        <button class="btn btn-sm btn-primary mt-2" data-bs-toggle="modal" data-bs-target="#addProjectModal">
+                                            <i class="fas fa-plus me-1"></i> إضافة مشروع جديد
+                                        </button>
+                                    </td>
+                                </tr>
+                            {% endif %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            
+            <!-- قسم الشرائح -->
+            <div class="tab-pane fade" id="sliders" role="tabpanel" aria-labelledby="sliders-tab">
+                <div class="d-flex justify-content-between mb-3">
+                    <h5>شرائح الصفحة الرئيسية</h5>
+                    <div>
+                        <button class="btn btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#addSliderModal">
+                            <i class="fas fa-plus me-1"></i> إضافة شريحة
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="row g-3">
+                    {% if sliders %}
+                        {% for slider in sliders %}
+                        <div class="col-md-6 col-lg-4">
+                            <div class="card shadow-sm h-100">
+                                {% if slider.image %}
+                                <img src="{{ slider.image.url }}" class="card-img-top" alt="{{ slider.title }}" style="height: 200px; object-fit: cover;">
+                                {% else %}
+                                <div class="bg-light d-flex align-items-center justify-content-center" style="height: 200px;">
+                                    <i class="fas fa-image fa-3x text-secondary"></i>
+                                </div>
+                                {% endif %}
+                                <div class="card-body">
+                                    <h5 class="card-title">{{ slider.title }}</h5>
+                                    <p class="card-text">{{ slider.description|truncatewords:15 }}</p>
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <small class="text-muted">الترتيب: {{ slider.order }}</small>
+                                        <div class="btn-group btn-group-sm">
+                                            <a href="#" class="btn btn-outline-primary"><i class="fas fa-edit"></i></a>
+                                            <a href="#" class="btn btn-outline-danger"><i class="fas fa-trash"></i></a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    {% else %}
+                        <div class="col-12 text-center py-4">
+                            <p class="text-muted mb-3">لا توجد شرائح مضافة للصفحة الرئيسية</p>
+                            <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addSliderModal">
+                                <i class="fas fa-plus me-1"></i> إضافة شريحة جديدة
+                            </button>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- نماذج إضافة المحتوى -->
+<!-- نموذج إضافة خدمة -->
+<div class="modal fade" id="addServiceModal" tabindex="-1" aria-labelledby="addServiceModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="addServiceModalLabel">إضافة خدمة جديدة</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form action="#" method="post" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label for="serviceTitle" class="form-label">عنوان الخدمة</label>
+                            <input type="text" class="form-control" id="serviceTitle" name="title" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="serviceCategory" class="form-label">التصنيف</label>
+                            <select class="form-select" id="serviceCategory" name="category">
+                                <option value="">اختر التصنيف</option>
+                                <option value="1">المقاولات العامة</option>
+                                <option value="2">التصميم الهندسي</option>
+                                <option value="3">إدارة المشاريع</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="serviceSlug" class="form-label">الرابط المختصر</label>
+                            <input type="text" class="form-control" id="serviceSlug" name="slug">
+                            <small class="text-muted">سيتم إنشاؤه تلقائيًا من العنوان إذا تُرك فارغًا</small>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="serviceOrder" class="form-label">الترتيب</label>
+                            <input type="number" class="form-control" id="serviceOrder" name="order" value="0">
+                        </div>
+                        <div class="col-12">
+                            <label for="serviceDescription" class="form-label">وصف مختصر</label>
+                            <textarea class="form-control" id="serviceDescription" name="short_description" rows="3"></textarea>
+                        </div>
+                        <div class="col-12">
+                            <label for="serviceContent" class="form-label">المحتوى التفصيلي</label>
+                            <textarea class="form-control" id="serviceContent" name="content" rows="5"></textarea>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="serviceImage" class="form-label">صورة الخدمة</label>
+                            <input type="file" class="form-control" id="serviceImage" name="image">
+                        </div>
+                        <div class="col-md-6">
+                            <label for="serviceFeatured" class="form-label d-block">خدمة مميزة</label>
+                            <div class="form-check form-switch mt-2">
+                                <input class="form-check-input" type="checkbox" id="serviceFeatured" name="featured">
+                                <label class="form-check-label" for="serviceFeatured">عرض في القسم المميز</label>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">إلغاء</button>
+                <button type="button" class="btn btn-primary">حفظ</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- نموذج إضافة مشروع -->
+<div class="modal fade" id="addProjectModal" tabindex="-1" aria-labelledby="addProjectModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="addProjectModalLabel">إضافة مشروع جديد</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form action="#" method="post" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label for="projectTitle" class="form-label">عنوان المشروع</label>
+                            <input type="text" class="form-control" id="projectTitle" name="title" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="projectCategory" class="form-label">التصنيف</label>
+                            <select class="form-select" id="projectCategory" name="category">
+                                <option value="">اختر التصنيف</option>
+                                <option value="1">سكني</option>
+                                <option value="2">تجاري</option>
+                                <option value="3">صناعي</option>
+                                <option value="4">حكومي</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="projectLocation" class="form-label">الموقع</label>
+                            <select class="form-select" id="projectLocation" name="location">
+                                <option value="">اختر الموقع</option>
+                                <option value="1">صنعاء</option>
+                                <option value="2">تعز</option>
+                                <option value="3">عدن</option>
+                                <option value="4">اب</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="projectSlug" class="form-label">الرابط المختصر</label>
+                            <input type="text" class="form-control" id="projectSlug" name="slug">
+                            <small class="text-muted">سيتم إنشاؤه تلقائيًا من العنوان إذا تُرك فارغًا</small>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="projectStartDate" class="form-label">تاريخ البدء</label>
+                            <input type="date" class="form-control" id="projectStartDate" name="start_date">
+                        </div>
+                        <div class="col-md-6">
+                            <label for="projectCompletionDate" class="form-label">تاريخ الإنجاز</label>
+                            <input type="date" class="form-control" id="projectCompletionDate" name="completion_date">
+                        </div>
+                        <div class="col-12">
+                            <label for="projectDescription" class="form-label">وصف المشروع</label>
+                            <textarea class="form-control" id="projectDescription" name="description" rows="4"></textarea>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="projectImage" class="form-label">صورة المشروع الرئيسية</label>
+                            <input type="file" class="form-control" id="projectImage" name="image">
+                        </div>
+                        <div class="col-md-6">
+                            <label for="projectFeatured" class="form-label d-block">مشروع مميز</label>
+                            <div class="form-check form-switch mt-2">
+                                <input class="form-check-input" type="checkbox" id="projectFeatured" name="featured">
+                                <label class="form-check-label" for="projectFeatured">عرض في القسم المميز</label>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">إلغاء</button>
+                <button type="button" class="btn btn-primary">حفظ</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- نموذج إضافة شريحة -->
+<div class="modal fade" id="addSliderModal" tabindex="-1" aria-labelledby="addSliderModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="addSliderModalLabel">إضافة شريحة جديدة</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form action="#" method="post" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    <div class="mb-3">
+                        <label for="sliderTitle" class="form-label">العنوان</label>
+                        <input type="text" class="form-control" id="sliderTitle" name="title" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="sliderDescription" class="form-label">الوصف</label>
+                        <textarea class="form-control" id="sliderDescription" name="description" rows="3"></textarea>
+                    </div>
+                    <div class="mb-3">
+                        <label for="sliderImage" class="form-label">الصورة</label>
+                        <input type="file" class="form-control" id="sliderImage" name="image" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="sliderOrder" class="form-label">الترتيب</label>
+                        <input type="number" class="form-control" id="sliderOrder" name="order" value="0">
+                    </div>
+                    <div class="mb-3">
+                        <label for="sliderUrl" class="form-label">رابط (اختياري)</label>
+                        <input type="url" class="form-control" id="sliderUrl" name="link">
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">إلغاء</button>
+                <button type="button" class="btn btn-primary">حفظ</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

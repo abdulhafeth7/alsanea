@@ -1,0 +1,193 @@
+{% extends "base.html" %}
+{% load static %}
+{% load i18n %}
+
+{% block title %}{% trans "تحديث الملف الشخصي" %} | {{ block.super }}{% endblock %}
+
+{% block content %}
+<section class="profile-update-section py-5">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-10">
+                <div class="card shadow-sm border-0">
+                    <div class="card-header bg-white d-flex justify-content-between align-items-center">
+                        <h5 class="mb-0">{% trans "تحديث الملف الشخصي" %}</h5>
+                        <a href="{% url 'accounts:profile' %}" class="btn btn-sm btn-outline-primary">
+                            <i class="fas fa-arrow-right me-2"></i>{% trans "العودة للملف الشخصي" %}
+                        </a>
+                    </div>
+                    <div class="card-body p-4">
+                        {% if messages %}
+                            {% for message in messages %}
+                                <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                                    {{ message }}
+                                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                                </div>
+                            {% endfor %}
+                        {% endif %}
+                        
+                        <form method="post" action="{% url 'accounts:profile_update' %}" enctype="multipart/form-data">
+                            {% csrf_token %}
+                            <div class="row g-4">
+                                <div class="col-12 text-center mb-3">
+                                    <div class="profile-image-edit">
+                                        {% if request.user.profile.image %}
+                                        <img src="{{ request.user.profile.image.url }}" alt="{{ request.user.get_full_name }}" class="img-fluid rounded-circle">
+                                        {% else %}
+                                        <div class="profile-avatar bg-primary text-white">
+                                            {{ request.user.first_name|first|upper }}{{ request.user.last_name|first|upper }}
+                                        </div>
+                                        {% endif %}
+                                        <label for="profile_image" class="profile-image-upload-label">
+                                            <i class="fas fa-camera"></i>
+                                        </label>
+                                        <input type="file" name="profile_image" id="profile_image" class="profile-image-upload-input" accept="image/*">
+                                    </div>
+                                    <small class="text-muted d-block mt-2">{% trans "انقر على الصورة لتغييرها" %}</small>
+                                </div>
+                                
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label for="first_name" class="form-label">{% trans "الاسم الأول" %}</label>
+                                        <input type="text" name="first_name" id="first_name" class="form-control" value="{{ request.user.first_name }}">
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label for="last_name" class="form-label">{% trans "الاسم الأخير" %}</label>
+                                        <input type="text" name="last_name" id="last_name" class="form-control" value="{{ request.user.last_name }}">
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label for="email" class="form-label">{% trans "البريد الإلكتروني" %}</label>
+                                        <input type="email" name="email" id="email" class="form-control" value="{{ request.user.email }}">
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label for="phone" class="form-label">{% trans "رقم الهاتف" %}</label>
+                                        <input type="text" name="phone" id="phone" class="form-control" value="{{ request.user.profile.phone|default:'' }}">
+                                    </div>
+                                </div>
+                                <div class="col-12">
+                                    <div class="mb-3">
+                                        <label for="bio" class="form-label">{% trans "نبذة شخصية" %}</label>
+                                        <textarea name="bio" id="bio" class="form-control" rows="4">{{ request.user.profile.bio|default:'' }}</textarea>
+                                    </div>
+                                </div>
+                                <div class="col-12 text-center">
+                                    <button type="submit" class="btn btn-primary px-5">
+                                        <i class="fas fa-save me-2"></i>{% trans "حفظ التغييرات" %}
+                                    </button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+    .profile-update-section {
+        background-color: #f8f9fa;
+        min-height: 80vh;
+    }
+    
+    .profile-image-edit {
+        position: relative;
+        width: 120px;
+        height: 120px;
+        margin: 0 auto;
+        border-radius: 50%;
+        overflow: hidden;
+        cursor: pointer;
+    }
+    
+    .profile-image-edit img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+    
+    .profile-avatar {
+        width: 120px;
+        height: 120px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 2.5rem;
+        font-weight: bold;
+    }
+    
+    .profile-image-upload-label {
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        background-color: rgba(0, 0, 0, 0.5);
+        color: white;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 40px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        opacity: 0;
+    }
+    
+    .profile-image-edit:hover .profile-image-upload-label {
+        opacity: 1;
+    }
+    
+    .profile-image-upload-input {
+        display: none;
+    }
+</style>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // عرض معاينة للصورة عند اختيارها
+        const profileImageInput = document.getElementById('profile_image');
+        const profileImageContainer = document.querySelector('.profile-image-edit');
+        
+        profileImageInput.addEventListener('change', function() {
+            if (this.files && this.files[0]) {
+                const reader = new FileReader();
+                
+                reader.onload = function(e) {
+                    // حذف الصورة الحالية أو الأفاتار
+                    const currentImage = profileImageContainer.querySelector('img');
+                    const currentAvatar = profileImageContainer.querySelector('.profile-avatar');
+                    
+                    if (currentImage) {
+                        currentImage.remove();
+                    }
+                    if (currentAvatar) {
+                        currentAvatar.remove();
+                    }
+                    
+                    // إنشاء عنصر صورة جديد
+                    const newImage = document.createElement('img');
+                    newImage.src = e.target.result;
+                    newImage.alt = 'Preview';
+                    newImage.className = 'img-fluid rounded-circle';
+                    
+                    // إضافة الصورة الجديدة قبل الملصق
+                    const label = profileImageContainer.querySelector('.profile-image-upload-label');
+                    profileImageContainer.insertBefore(newImage, label);
+                };
+                
+                reader.readAsDataURL(this.files[0]);
+            }
+        });
+    });
+</script>
+{% endblock %} 

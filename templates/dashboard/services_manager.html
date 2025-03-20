@@ -1,0 +1,364 @@
+{% extends "dashboard/base.html" %}
+{% load static %}
+
+{% block title %}إدارة الخدمات - لوحة التحكم{% endblock %}
+
+{% block dashboard_content %}
+<div class="container-fluid">
+    <!-- عنوان الصفحة -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1 class="h3 mb-0 text-gray-800">إدارة الخدمات</h1>
+        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addServiceModal">
+            <i class="fas fa-plus-circle me-1"></i> إضافة خدمة جديدة
+        </button>
+    </div>
+
+    <!-- بطاقات إحصائية -->
+    <div class="row mb-4">
+        <div class="col-xl-4 col-md-6 mb-4">
+            <div class="card border-right-primary h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col ms-2">
+                            <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">إجمالي الخدمات</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">{{ services_count|default:"0" }}</div>
+                        </div>
+                        <div class="col-auto me-2">
+                            <i class="fas fa-cogs fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-4 col-md-6 mb-4">
+            <div class="card border-right-success h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col ms-2">
+                            <div class="text-xs font-weight-bold text-success text-uppercase mb-1">الخدمات النشطة</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">{{ active_services_count|default:"0" }}</div>
+                        </div>
+                        <div class="col-auto me-2">
+                            <i class="fas fa-check-circle fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-4 col-md-6 mb-4">
+            <div class="card border-right-warning h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col ms-2">
+                            <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">الخدمات المميزة</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">{{ featured_services_count|default:"0" }}</div>
+                        </div>
+                        <div class="col-auto me-2">
+                            <i class="fas fa-star fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- جدول الخدمات -->
+    <div class="card shadow mb-4">
+        <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+            <h6 class="m-0 font-weight-bold text-primary">قائمة الخدمات</h6>
+            <div class="dropdown no-arrow">
+                <a class="dropdown-toggle" href="#" role="button" id="dropdownMenuLink" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    <i class="fas fa-ellipsis-v fa-sm fa-fw text-gray-400"></i>
+                </a>
+                <div class="dropdown-menu dropdown-menu-end shadow animated--fade-in" aria-labelledby="dropdownMenuLink">
+                    <div class="dropdown-header">خيارات:</div>
+                    <a class="dropdown-item" href="#" id="exportCSV">تصدير CSV</a>
+                    <a class="dropdown-item" href="#" id="exportPDF">تصدير PDF</a>
+                    <div class="dropdown-divider"></div>
+                    <a class="dropdown-item" href="#" id="refreshTable">تحديث البيانات</a>
+                </div>
+            </div>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-bordered table-hover" id="servicesTable" width="100%" cellspacing="0">
+                    <thead>
+                        <tr>
+                            <th width="60">الصورة</th>
+                            <th>اسم الخدمة</th>
+                            <th>وصف مختصر</th>
+                            <th>الرمز</th>
+                            <th>مميزة</th>
+                            <th>الترتيب</th>
+                            <th>الحالة</th>
+                            <th width="150">الإجراءات</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% if services %}
+                            {% for service in services %}
+                            <tr>
+                                <td>
+                                    {% if service.image %}
+                                        <img src="{{ service.image.url }}" alt="{{ service.title }}" class="img-thumbnail" style="width: 50px; height: 50px; object-fit: cover;">
+                                    {% else %}
+                                        <div class="bg-light d-flex align-items-center justify-content-center" style="width: 50px; height: 50px;">
+                                            <i class="fas fa-cog text-secondary"></i>
+                                        </div>
+                                    {% endif %}
+                                </td>
+                                <td>{{ service.title }}</td>
+                                <td>{{ service.short_description|truncatechars:50 }}</td>
+                                <td><i class="{{ service.icon_class }}"></i> {{ service.icon_class }}</td>
+                                <td>
+                                    {% if service.is_featured %}
+                                        <span class="badge bg-success">نعم</span>
+                                    {% else %}
+                                        <span class="badge bg-secondary">لا</span>
+                                    {% endif %}
+                                </td>
+                                <td>{{ service.order|default:"0" }}</td>
+                                <td>
+                                    {% if service.is_active %}
+                                        <span class="badge bg-success">نشط</span>
+                                    {% else %}
+                                        <span class="badge bg-danger">غير نشط</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <div class="btn-group" role="group">
+                                        <a href="{% url 'dashboard:service_detail' service.id %}" class="btn btn-sm btn-info">
+                                            <i class="fas fa-eye"></i>
+                                        </a>
+                                        <a href="{% url 'dashboard:edit_service' service.id %}" class="btn btn-sm btn-warning">
+                                            <i class="fas fa-edit"></i>
+                                        </a>
+                                        <button type="button" class="btn btn-sm btn-danger" onclick="deleteService('{{ service.id }}', '{{ service.title }}')">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        {% else %}
+                            <tr>
+                                <td colspan="8" class="text-center">لا توجد خدمات متاحة</td>
+                            </tr>
+                        {% endif %}
+                    </tbody>
+                </table>
+            </div>
+            
+            <!-- ترقيم الصفحات -->
+            {% if services.has_other_pages %}
+            <nav aria-label="Page navigation">
+                <ul class="pagination justify-content-center mt-3">
+                    {% if services.has_previous %}
+                        <li class="page-item">
+                            <a class="page-link" href="?page={{ services.previous_page_number }}" aria-label="Previous">
+                                <span aria-hidden="true">&laquo;</span>
+                            </a>
+                        </li>
+                    {% else %}
+                        <li class="page-item disabled">
+                            <span class="page-link">&laquo;</span>
+                        </li>
+                    {% endif %}
+                    
+                    {% for i in services.paginator.page_range %}
+                        {% if services.number == i %}
+                            <li class="page-item active"><span class="page-link">{{ i }}</span></li>
+                        {% else %}
+                            <li class="page-item"><a class="page-link" href="?page={{ i }}">{{ i }}</a></li>
+                        {% endif %}
+                    {% endfor %}
+                    
+                    {% if services.has_next %}
+                        <li class="page-item">
+                            <a class="page-link" href="?page={{ services.next_page_number }}" aria-label="Next">
+                                <span aria-hidden="true">&raquo;</span>
+                            </a>
+                        </li>
+                    {% else %}
+                        <li class="page-item disabled">
+                            <span class="page-link">&raquo;</span>
+                        </li>
+                    {% endif %}
+                </ul>
+            </nav>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<!-- مودال إضافة خدمة جديدة -->
+<div class="modal fade" id="addServiceModal" tabindex="-1" aria-labelledby="addServiceModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="addServiceModalLabel">إضافة خدمة جديدة</h5>
+                <button type="button" class="btn-close ms-0 me-auto" data-bs-dismiss="modal" aria-label="إغلاق"></button>
+            </div>
+            <form method="post" action="{% url 'dashboard:add_service' %}" enctype="multipart/form-data">
+                {% csrf_token %}
+                <div class="modal-body">
+                    <div class="row g-3">
+                        <!-- البيانات الأساسية -->
+                        <div class="col-md-6">
+                            <label for="title" class="form-label">اسم الخدمة <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" id="title" name="title" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="slug" class="form-label">الرابط المختصر <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" id="slug" name="slug" required>
+                            <small class="text-muted">مثال: engineering-design</small>
+                        </div>
+                        
+                        <div class="col-12">
+                            <label for="short_description" class="form-label">وصف مختصر <span class="text-danger">*</span></label>
+                            <textarea class="form-control" id="short_description" name="short_description" rows="2" required></textarea>
+                        </div>
+                        
+                        <div class="col-12">
+                            <label for="description" class="form-label">وصف تفصيلي <span class="text-danger">*</span></label>
+                            <textarea class="form-control rich-editor" id="description" name="description" rows="5" required></textarea>
+                        </div>
+                        
+                        <!-- الأيقونة والترتيب -->
+                        <div class="col-md-6">
+                            <label for="icon_class" class="form-label">الأيقونة (Font Awesome)</label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="fas fa-cog"></i></span>
+                                <input type="text" class="form-control" id="icon_class" name="icon_class" placeholder="fas fa-building">
+                            </div>
+                            <small class="text-muted">يمكنك اختيار أيقونة من <a href="https://fontawesome.com/icons" target="_blank">هنا</a></small>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="order" class="form-label">الترتيب</label>
+                            <input type="number" class="form-control" id="order" name="order" min="0" value="0">
+                            <small class="text-muted">الخدمات ذات الأرقام الأصغر تظهر أولاً</small>
+                        </div>
+                        
+                        <!-- الصورة والحالة -->
+                        <div class="col-md-6">
+                            <label for="image" class="form-label">صورة الخدمة</label>
+                            <input type="file" class="form-control" id="image" name="image" accept="image/*">
+                        </div>
+                        <div class="col-md-6">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <label class="form-check-label d-block mb-2">حالة الخدمة</label>
+                                    <div class="form-check form-switch">
+                                        <input class="form-check-input" type="checkbox" id="is_active" name="is_active" checked>
+                                        <label class="form-check-label" for="is_active">نشط</label>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-check-label d-block mb-2">خدمة مميزة</label>
+                                    <div class="form-check form-switch">
+                                        <input class="form-check-input" type="checkbox" id="is_featured" name="is_featured">
+                                        <label class="form-check-label" for="is_featured">مميزة</label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- تحسين محركات البحث -->
+                        <div class="col-12 mt-4">
+                            <h6 class="fw-bold">بيانات SEO (اختياري)</h6>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="meta_title" class="form-label">عنوان Meta</label>
+                            <input type="text" class="form-control" id="meta_title" name="meta_title">
+                        </div>
+                        <div class="col-md-6">
+                            <label for="meta_keywords" class="form-label">الكلمات المفتاحية</label>
+                            <input type="text" class="form-control" id="meta_keywords" name="meta_keywords">
+                            <small class="text-muted">افصل بين الكلمات بفاصلة</small>
+                        </div>
+                        <div class="col-12">
+                            <label for="meta_description" class="form-label">وصف Meta</label>
+                            <textarea class="form-control" id="meta_description" name="meta_description" rows="2"></textarea>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">إغلاق</button>
+                    <button type="submit" class="btn btn-primary">إضافة الخدمة</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- مودال حذف خدمة -->
+<div class="modal fade" id="deleteServiceModal" tabindex="-1" aria-labelledby="deleteServiceModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="deleteServiceModalLabel">حذف خدمة</h5>
+                <button type="button" class="btn-close ms-0 me-auto" data-bs-dismiss="modal" aria-label="إغلاق"></button>
+            </div>
+            <div class="modal-body">
+                <p>هل أنت متأكد من حذف الخدمة: <span id="serviceTitle" class="fw-bold"></span>؟</p>
+                <p class="text-danger">لا يمكن التراجع عن هذه العملية.</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">إلغاء</button>
+                <form id="deleteServiceForm" method="post" action="">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-danger">تأكيد الحذف</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // دالة لحذف الخدمة
+    function deleteService(serviceId, serviceTitle) {
+        document.getElementById('serviceTitle').textContent = serviceTitle;
+        document.getElementById('deleteServiceForm').action = "{% url 'dashboard:delete_service' 0 %}".replace('0', serviceId);
+        new bootstrap.Modal(document.getElementById('deleteServiceModal')).show();
+    }
+
+    // إنشاء slug تلقائيًا
+    document.getElementById('title').addEventListener('input', function() {
+        const title = this.value;
+        const slug = title
+            .toLowerCase()
+            .replace(/ء|أ|إ|آ/g, 'a')
+            .replace(/ة/g, 'a')
+            .replace(/ى|ي/g, 'y')
+            .replace(/و/g, 'w')
+            .replace(/[^\w\s]/gi, '')
+            .replace(/\s+/g, '-');
+        document.getElementById('slug').value = slug;
+    });
+
+    // تفعيل محرر النصوص المتقدم
+    $(document).ready(function() {
+        if (typeof tinymce !== 'undefined') {
+            tinymce.init({
+                selector: '.rich-editor',
+                directionality: 'rtl',
+                height: 300,
+                plugins: 'link image lists table media',
+                toolbar: 'undo redo | formatselect | bold italic | alignright aligncenter alignleft | bullist numlist | link image media',
+                language: 'ar'
+            });
+        }
+
+        // تفعيل DataTables
+        $('#servicesTable').DataTable({
+            language: {
+                url: "//cdn.datatables.net/plug-ins/1.10.25/i18n/Arabic.json"
+            },
+            "order": [[5, "asc"]],
+            "pageLength": 10
+        });
+    });
+</script>
+{% endblock %} 

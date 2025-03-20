@@ -1,0 +1,265 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}المشاريع - شركة الصانع{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12 text-center mb-5">
+        <h2 class="display-4">مشاريعنا</h2>
+        <p class="lead">نفخر بتقديم مجموعة من أفضل المشاريع التي قمنا بتنفيذها</p>
+    </div>
+</div>
+
+<!-- فلتر المشاريع -->
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-body">
+                <form method="get" class="row g-3">
+                    <div class="col-md-4">
+                        <label for="category" class="form-label">التصنيف</label>
+                        <select name="category" id="category" class="form-select">
+                            <option value="">جميع التصنيفات</option>
+                            {% for category in categories %}
+                                <option value="{{ category.id }}" {% if request.GET.category == category.id|stringformat:"i" %}selected{% endif %}>{{ category.name }}</option>
+                            {% endfor %}
+                            {% if not categories %}
+                                <option value="1">سكني</option>
+                                <option value="2">تجاري</option>
+                                <option value="3">صناعي</option>
+                                <option value="4">تعليمي</option>
+                                <option value="5">صحي</option>
+                            {% endif %}
+                        </select>
+                    </div>
+                    <div class="col-md-4">
+                        <label for="location" class="form-label">الموقع</label>
+                        <select name="location" id="location" class="form-select">
+                            <option value="">جميع المواقع</option>
+                            {% for location in locations %}
+                                <option value="{{ location.id }}" {% if request.GET.location == location.id|stringformat:"i" %}selected{% endif %}>{{ location.name }}</option>
+                            {% endfor %}
+                            {% if not locations %}
+                                <option value="1">الرياض</option>
+                                <option value="2">جدة</option>
+                                <option value="3">الدمام</option>
+                                <option value="4">مكة</option>
+                                <option value="5">المدينة</option>
+                            {% endif %}
+                        </select>
+                    </div>
+                    <div class="col-md-4">
+                        <label for="sort" class="form-label">الترتيب</label>
+                        <select name="sort" id="sort" class="form-select">
+                            <option value="newest" {% if request.GET.sort == 'newest' %}selected{% endif %}>الأحدث أولاً</option>
+                            <option value="oldest" {% if request.GET.sort == 'oldest' %}selected{% endif %}>الأقدم أولاً</option>
+                            <option value="name_asc" {% if request.GET.sort == 'name_asc' %}selected{% endif %}>الاسم (أ-ي)</option>
+                            <option value="name_desc" {% if request.GET.sort == 'name_desc' %}selected{% endif %}>الاسم (ي-أ)</option>
+                        </select>
+                    </div>
+                    <div class="col-12 text-center mt-4">
+                        <button type="submit" class="btn btn-primary px-4">تصفية</button>
+                        <a href="{% url 'services:projects_list' %}" class="btn btn-outline-secondary px-4 ms-2">إعادة ضبط</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- قائمة المشاريع -->
+<div class="row mb-5">
+    {% if projects %}
+        {% for project in projects %}
+        <div class="col-md-4 mb-4">
+            <div class="card h-100">
+                {% if project.image %}
+                <img src="{{ project.image.url }}" class="card-img-top" alt="{{ project.title }}">
+                {% else %}
+                <div class="text-center pt-4">
+                    <i class="fas fa-building service-icon"></i>
+                </div>
+                {% endif %}
+                <div class="card-body">
+                    <h3 class="card-title">{{ project.title }}</h3>
+                    <div class="my-3">
+                        {% if project.category %}
+                        <span class="badge bg-primary me-2">{{ project.category.name }}</span>
+                        {% endif %}
+                        {% if project.location %}
+                        <span class="badge bg-secondary">{{ project.location.name }}</span>
+                        {% endif %}
+                    </div>
+                    <p class="card-text">{{ project.description|truncatewords:20 }}</p>
+                    <a href="{% url 'services:project_detail' project.slug %}" class="btn btn-primary">عرض التفاصيل</a>
+                </div>
+                <div class="card-footer text-muted">
+                    <small><i class="fas fa-calendar-alt me-1"></i> {{ project.completion_date|date:"Y/m/d" }}</small>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    {% else %}
+        <!-- مشاريع افتراضية في حالة عدم وجود مشاريع في قاعدة البيانات -->
+        <div class="col-md-4 mb-4">
+            <div class="card h-100">
+                <img src="{% static 'images/project1.jpg' %}" class="card-img-top" alt="مشروع فلل سكنية">
+                <div class="card-body">
+                    <h3 class="card-title">مشروع فلل سكنية</h3>
+                    <div class="my-3">
+                        <span class="badge bg-primary me-2">سكني</span>
+                        <span class="badge bg-secondary">الرياض</span>
+                    </div>
+                    <p class="card-text">مشروع إنشاء مجمع فلل سكنية فاخرة يضم 20 وحدة سكنية بتصاميم عصرية ومساحات خضراء.</p>
+                    <a href="#" class="btn btn-primary">عرض التفاصيل</a>
+                </div>
+                <div class="card-footer text-muted">
+                    <small><i class="fas fa-calendar-alt me-1"></i> 2022/06/15</small>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 mb-4">
+            <div class="card h-100">
+                <img src="{% static 'images/project2.jpg' %}" class="card-img-top" alt="مركز تجاري">
+                <div class="card-body">
+                    <h3 class="card-title">مركز تجاري</h3>
+                    <div class="my-3">
+                        <span class="badge bg-primary me-2">تجاري</span>
+                        <span class="badge bg-secondary">جدة</span>
+                    </div>
+                    <p class="card-text">تصميم وإنشاء مركز تجاري على مساحة 5000 متر مربع يضم محلات تجارية ومطاعم ومواقف سيارات.</p>
+                    <a href="#" class="btn btn-primary">عرض التفاصيل</a>
+                </div>
+                <div class="card-footer text-muted">
+                    <small><i class="fas fa-calendar-alt me-1"></i> 2021/12/10</small>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 mb-4">
+            <div class="card h-100">
+                <img src="{% static 'images/project3.jpg' %}" class="card-img-top" alt="مستشفى خاص">
+                <div class="card-body">
+                    <h3 class="card-title">مستشفى خاص</h3>
+                    <div class="my-3">
+                        <span class="badge bg-primary me-2">صحي</span>
+                        <span class="badge bg-secondary">الرياض</span>
+                    </div>
+                    <p class="card-text">تصميم وتنفيذ مستشفى خاص بسعة 150 سرير مجهز بأحدث التقنيات الطبية ويضم عيادات خارجية.</p>
+                    <a href="#" class="btn btn-primary">عرض التفاصيل</a>
+                </div>
+                <div class="card-footer text-muted">
+                    <small><i class="fas fa-calendar-alt me-1"></i> 2023/02/28</small>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 mb-4">
+            <div class="card h-100">
+                <img src="{% static 'images/project4.jpg' %}" class="card-img-top" alt="مجمع تعليمي">
+                <div class="card-body">
+                    <h3 class="card-title">مجمع تعليمي</h3>
+                    <div class="my-3">
+                        <span class="badge bg-primary me-2">تعليمي</span>
+                        <span class="badge bg-secondary">الدمام</span>
+                    </div>
+                    <p class="card-text">تصميم وبناء مجمع تعليمي متكامل يضم مدارس للمراحل الابتدائية والمتوسطة والثانوية ومرافق رياضية.</p>
+                    <a href="#" class="btn btn-primary">عرض التفاصيل</a>
+                </div>
+                <div class="card-footer text-muted">
+                    <small><i class="fas fa-calendar-alt me-1"></i> 2022/08/20</small>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 mb-4">
+            <div class="card h-100">
+                <img src="{% static 'images/project5.jpg' %}" class="card-img-top" alt="مصنع إنتاج">
+                <div class="card-body">
+                    <h3 class="card-title">مصنع إنتاج</h3>
+                    <div class="my-3">
+                        <span class="badge bg-primary me-2">صناعي</span>
+                        <span class="badge bg-secondary">جدة</span>
+                    </div>
+                    <p class="card-text">تصميم وإنشاء مصنع إنتاج على مساحة 10000 متر مربع مع مستودعات ومباني إدارية ومرافق للعمال.</p>
+                    <a href="#" class="btn btn-primary">عرض التفاصيل</a>
+                </div>
+                <div class="card-footer text-muted">
+                    <small><i class="fas fa-calendar-alt me-1"></i> 2021/09/15</small>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 mb-4">
+            <div class="card h-100">
+                <img src="{% static 'images/project6.jpg' %}" class="card-img-top" alt="فندق 5 نجوم">
+                <div class="card-body">
+                    <h3 class="card-title">فندق 5 نجوم</h3>
+                    <div class="my-3">
+                        <span class="badge bg-primary me-2">سياحي</span>
+                        <span class="badge bg-secondary">مكة</span>
+                    </div>
+                    <p class="card-text">تصميم وتنفيذ فندق فاخر من فئة 5 نجوم يضم 250 غرفة وأجنحة فاخرة ومطاعم وقاعات مؤتمرات.</p>
+                    <a href="#" class="btn btn-primary">عرض التفاصيل</a>
+                </div>
+                <div class="card-footer text-muted">
+                    <small><i class="fas fa-calendar-alt me-1"></i> 2023/04/10</small>
+                </div>
+            </div>
+        </div>
+    {% endif %}
+</div>
+
+<!-- ترقيم الصفحات -->
+{% if is_paginated %}
+<nav aria-label="Page navigation">
+    <ul class="pagination justify-content-center">
+        {% if page_obj.has_previous %}
+        <li class="page-item">
+            <a class="page-link" href="?page=1{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}" aria-label="First">
+                <span aria-hidden="true">&laquo;&laquo;</span>
+            </a>
+        </li>
+        <li class="page-item">
+            <a class="page-link" href="?page={{ page_obj.previous_page_number }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}" aria-label="Previous">
+                <span aria-hidden="true">&laquo;</span>
+            </a>
+        </li>
+        {% endif %}
+
+        {% for i in paginator.page_range %}
+            {% if page_obj.number == i %}
+            <li class="page-item active"><a class="page-link" href="#">{{ i }}</a></li>
+            {% elif i > page_obj.number|add:'-3' and i < page_obj.number|add:'3' %}
+            <li class="page-item">
+                <a class="page-link" href="?page={{ i }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}">{{ i }}</a>
+            </li>
+            {% endif %}
+        {% endfor %}
+
+        {% if page_obj.has_next %}
+        <li class="page-item">
+            <a class="page-link" href="?page={{ page_obj.next_page_number }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}" aria-label="Next">
+                <span aria-hidden="true">&raquo;</span>
+            </a>
+        </li>
+        <li class="page-item">
+            <a class="page-link" href="?page={{ paginator.num_pages }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}" aria-label="Last">
+                <span aria-hidden="true">&raquo;&raquo;</span>
+            </a>
+        </li>
+        {% endif %}
+    </ul>
+</nav>
+{% endif %}
+
+<!-- قسم للعملاء المهتمين -->
+<div class="row mt-5">
+    <div class="col-12">
+        <div class="card bg-light">
+            <div class="card-body text-center p-4">
+                <h3>هل تحتاج إلى خدماتنا في مشروعك القادم؟</h3>
+                <p class="lead">نحن جاهزون لمساعدتك في تحقيق رؤيتك وتنفيذ مشروعك بأعلى معايير الجودة</p>
+                <a href="{% url 'core:contact' %}" class="btn btn-lg btn-primary mt-2">تواصل معنا الآن</a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

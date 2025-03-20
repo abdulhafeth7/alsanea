@@ -1,0 +1,384 @@
+{% extends "dashboard/base.html" %}
+{% load static %}
+
+{% block title %}إدارة فريق العمل - لوحة التحكم{% endblock %}
+
+{% block dashboard_content %}
+<div class="container-fluid">
+    <!-- عنوان الصفحة -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1 class="h3 mb-0 text-gray-800">إدارة فريق العمل</h1>
+        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addTeamMemberModal">
+            <i class="fas fa-plus-circle me-1"></i> إضافة عضو جديد
+        </button>
+    </div>
+
+    <!-- بطاقات إحصائية -->
+    <div class="row mb-4">
+        <div class="col-xl-4 col-md-6 mb-4">
+            <div class="card border-right-primary h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col ms-2">
+                            <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">إجمالي الفريق</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">{{ team_count|default:"0" }}</div>
+                        </div>
+                        <div class="col-auto me-2">
+                            <i class="fas fa-users fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-4 col-md-6 mb-4">
+            <div class="card border-right-success h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col ms-2">
+                            <div class="text-xs font-weight-bold text-success text-uppercase mb-1">المهندسين</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">{{ engineers_count|default:"0" }}</div>
+                        </div>
+                        <div class="col-auto me-2">
+                            <i class="fas fa-hard-hat fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-4 col-md-6 mb-4">
+            <div class="card border-right-info h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col ms-2">
+                            <div class="text-xs font-weight-bold text-info text-uppercase mb-1">الإداريين</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">{{ admins_count|default:"0" }}</div>
+                        </div>
+                        <div class="col-auto me-2">
+                            <i class="fas fa-user-tie fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- عرض أعضاء الفريق -->
+    <div class="row">
+        {% if team_members %}
+            {% for member in team_members %}
+            <div class="col-xl-3 col-md-6 mb-4">
+                <div class="card team-card h-100">
+                    <div class="card-header bg-transparent d-flex justify-content-end">
+                        <div class="dropdown no-arrow">
+                            <a class="dropdown-toggle" href="#" role="button" id="dropdownMenuLink{{ member.id }}" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                <i class="fas fa-ellipsis-v fa-sm fa-fw text-gray-400"></i>
+                            </a>
+                            <div class="dropdown-menu dropdown-menu-end shadow animated--fade-in" aria-labelledby="dropdownMenuLink{{ member.id }}">
+                                <a class="dropdown-item" href="{% url 'dashboard:edit_team_member' member.id %}">
+                                    <i class="fas fa-edit fa-sm fa-fw me-2 text-warning"></i>تعديل
+                                </a>
+                                <a class="dropdown-item" href="#" onclick="event.preventDefault(); confirmDelete('{{ member.id }}', '{{ member.name }}')">
+                                    <i class="fas fa-trash fa-sm fa-fw me-2 text-danger"></i>حذف
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="text-center pt-3">
+                        {% if member.image %}
+                            <img src="{{ member.image.url }}" alt="{{ member.name }}" class="team-member-img rounded-circle mb-3" width="120" height="120">
+                        {% else %}
+                            <div class="bg-light rounded-circle d-flex align-items-center justify-content-center mx-auto mb-3" style="width: 120px; height: 120px;">
+                                <i class="fas fa-user fa-4x text-secondary"></i>
+                            </div>
+                        {% endif %}
+                        <h4 class="h5 card-title">{{ member.name }}</h4>
+                        <p class="card-text text-muted">{{ member.position }}</p>
+                    </div>
+                    <div class="card-body pt-0">
+                        <hr>
+                        <div class="team-meta">
+                            {% if member.email %}
+                            <div class="team-meta-item">
+                                <i class="fas fa-envelope text-primary me-2"></i>
+                                <a href="mailto:{{ member.email }}">{{ member.email }}</a>
+                            </div>
+                            {% endif %}
+                            {% if member.phone %}
+                            <div class="team-meta-item">
+                                <i class="fas fa-phone text-primary me-2"></i>
+                                <a href="tel:{{ member.phone }}">{{ member.phone }}</a>
+                            </div>
+                            {% endif %}
+                            <div class="team-meta-item">
+                                <i class="fas fa-calendar-alt text-primary me-2"></i>
+                                انضم في {{ member.join_date|date:"Y/m/d" }}
+                            </div>
+                        </div>
+                        <div class="social-links text-center mt-3">
+                            {% if member.linkedin %}
+                            <a href="{{ member.linkedin }}" target="_blank" class="social-link">
+                                <i class="fab fa-linkedin"></i>
+                            </a>
+                            {% endif %}
+                            {% if member.twitter %}
+                            <a href="{{ member.twitter }}" target="_blank" class="social-link">
+                                <i class="fab fa-twitter"></i>
+                            </a>
+                            {% endif %}
+                            {% if member.facebook %}
+                            <a href="{{ member.facebook }}" target="_blank" class="social-link">
+                                <i class="fab fa-facebook"></i>
+                            </a>
+                            {% endif %}
+                            {% if member.instagram %}
+                            <a href="{{ member.instagram }}" target="_blank" class="social-link">
+                                <i class="fab fa-instagram"></i>
+                            </a>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        {% else %}
+            <div class="col-12">
+                <div class="alert alert-info text-center">
+                    لا يوجد أعضاء في الفريق. قم بإضافة أعضاء جدد باستخدام زر "إضافة عضو جديد".
+                </div>
+            </div>
+        {% endif %}
+    </div>
+
+    <!-- ترقيم الصفحات -->
+    {% if team_members.has_other_pages %}
+    <div class="row">
+        <div class="col-12">
+            <nav aria-label="Page navigation">
+                <ul class="pagination justify-content-center mt-3">
+                    {% if team_members.has_previous %}
+                        <li class="page-item">
+                            <a class="page-link" href="?page={{ team_members.previous_page_number }}" aria-label="Previous">
+                                <span aria-hidden="true">&laquo;</span>
+                            </a>
+                        </li>
+                    {% else %}
+                        <li class="page-item disabled">
+                            <span class="page-link">&laquo;</span>
+                        </li>
+                    {% endif %}
+                    
+                    {% for i in team_members.paginator.page_range %}
+                        {% if team_members.number == i %}
+                            <li class="page-item active"><span class="page-link">{{ i }}</span></li>
+                        {% else %}
+                            <li class="page-item"><a class="page-link" href="?page={{ i }}">{{ i }}</a></li>
+                        {% endif %}
+                    {% endfor %}
+                    
+                    {% if team_members.has_next %}
+                        <li class="page-item">
+                            <a class="page-link" href="?page={{ team_members.next_page_number }}" aria-label="Next">
+                                <span aria-hidden="true">&raquo;</span>
+                            </a>
+                        </li>
+                    {% else %}
+                        <li class="page-item disabled">
+                            <span class="page-link">&raquo;</span>
+                        </li>
+                    {% endif %}
+                </ul>
+            </nav>
+        </div>
+    </div>
+    {% endif %}
+</div>
+
+<!-- مودال إضافة عضو جديد -->
+<div class="modal fade" id="addTeamMemberModal" tabindex="-1" aria-labelledby="addTeamMemberModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="addTeamMemberModalLabel">إضافة عضو جديد</h5>
+                <button type="button" class="btn-close ms-0 me-auto" data-bs-dismiss="modal" aria-label="إغلاق"></button>
+            </div>
+            <form method="post" action="{% url 'dashboard:add_team_member' %}" enctype="multipart/form-data">
+                {% csrf_token %}
+                <div class="modal-body">
+                    <div class="row g-3">
+                        <!-- البيانات الشخصية -->
+                        <div class="col-md-6">
+                            <label for="name" class="form-label">الاسم <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" id="name" name="name" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="position" class="form-label">المنصب <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" id="position" name="position" required>
+                        </div>
+                        
+                        <div class="col-md-6">
+                            <label for="email" class="form-label">البريد الإلكتروني <span class="text-danger">*</span></label>
+                            <input type="email" class="form-control" id="email" name="email" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="phone" class="form-label">رقم الهاتف</label>
+                            <input type="text" class="form-control" id="phone" name="phone">
+                        </div>
+                        
+                        <div class="col-md-6">
+                            <label for="department" class="form-label">القسم</label>
+                            <select class="form-select" id="department" name="department">
+                                <option value="">اختر القسم</option>
+                                <option value="engineering">الهندسة</option>
+                                <option value="management">الإدارة</option>
+                                <option value="design">التصميم</option>
+                                <option value="construction">البناء والتشييد</option>
+                                <option value="finance">المالية</option>
+                                <option value="hr">الموارد البشرية</option>
+                                <option value="other">أخرى</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="join_date" class="form-label">تاريخ الانضمام</label>
+                            <input type="date" class="form-control" id="join_date" name="join_date">
+                        </div>
+                        
+                        <!-- السيرة الذاتية والصورة -->
+                        <div class="col-12">
+                            <label for="bio" class="form-label">نبذة تعريفية</label>
+                            <textarea class="form-control" id="bio" name="bio" rows="3"></textarea>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="image" class="form-label">الصورة الشخصية</label>
+                            <input type="file" class="form-control" id="image" name="image" accept="image/*">
+                        </div>
+                        <div class="col-md-6">
+                            <label for="order" class="form-label">الترتيب</label>
+                            <input type="number" class="form-control" id="order" name="order" min="1" value="1">
+                            <small class="text-muted">الأعضاء ذوي الترتيب الأصغر يظهرون أولاً</small>
+                        </div>
+                        
+                        <!-- مواقع التواصل الاجتماعي -->
+                        <div class="col-12 mt-4">
+                            <h6 class="fw-bold">مواقع التواصل الاجتماعي</h6>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="linkedin" class="form-label">LinkedIn</label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="fab fa-linkedin"></i></span>
+                                <input type="url" class="form-control" id="linkedin" name="linkedin" placeholder="https://linkedin.com/in/username">
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="twitter" class="form-label">Twitter</label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="fab fa-twitter"></i></span>
+                                <input type="url" class="form-control" id="twitter" name="twitter" placeholder="https://twitter.com/username">
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="facebook" class="form-label">Facebook</label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="fab fa-facebook"></i></span>
+                                <input type="url" class="form-control" id="facebook" name="facebook" placeholder="https://facebook.com/username">
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="instagram" class="form-label">Instagram</label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="fab fa-instagram"></i></span>
+                                <input type="url" class="form-control" id="instagram" name="instagram" placeholder="https://instagram.com/username">
+                            </div>
+                        </div>
+                        
+                        <!-- إعدادات العرض -->
+                        <div class="col-12 mt-4">
+                            <h6 class="fw-bold">إعدادات العرض</h6>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-check form-switch mt-2">
+                                <input class="form-check-input" type="checkbox" id="is_active" name="is_active" checked>
+                                <label class="form-check-label" for="is_active">عرض في صفحة الفريق</label>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-check form-switch mt-2">
+                                <input class="form-check-input" type="checkbox" id="is_key_member" name="is_key_member">
+                                <label class="form-check-label" for="is_key_member">عضو رئيسي في الفريق</label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">إغلاق</button>
+                    <button type="submit" class="btn btn-primary">إضافة العضو</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- مودال حذف العضو -->
+<div class="modal fade" id="deleteTeamMemberModal" tabindex="-1" aria-labelledby="deleteTeamMemberModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="deleteTeamMemberModalLabel">حذف عضو من الفريق</h5>
+                <button type="button" class="btn-close ms-0 me-auto" data-bs-dismiss="modal" aria-label="إغلاق"></button>
+            </div>
+            <div class="modal-body">
+                <p>هل أنت متأكد من حذف <span id="memberName" class="fw-bold"></span> من فريق العمل؟</p>
+                <p class="text-danger">لا يمكن التراجع عن هذه العملية.</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">إلغاء</button>
+                <form id="deleteTeamMemberForm" method="post" action="">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-danger">تأكيد الحذف</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // دالة لتأكيد حذف عضو
+    function confirmDelete(memberId, memberName) {
+        document.getElementById('memberName').textContent = memberName;
+        document.getElementById('deleteTeamMemberForm').action = "{% url 'dashboard:delete_team_member' 0 %}".replace('0', memberId);
+        new bootstrap.Modal(document.getElementById('deleteTeamMemberModal')).show();
+    }
+    
+    // تنسيقات إضافية للصفحة
+    document.addEventListener('DOMContentLoaded', function() {
+        // تنسيق صور الأعضاء
+        document.querySelectorAll('.team-member-img').forEach(img => {
+            img.style.objectFit = 'cover';
+            img.style.border = '4px solid #e6e6e6';
+        });
+        
+        // تنسيق روابط التواصل
+        document.querySelectorAll('.social-link').forEach(link => {
+            link.style.margin = '0 5px';
+            link.style.color = '#718096';
+            link.style.fontSize = '18px';
+            link.style.transition = 'all 0.3s ease';
+        });
+        
+        // تأثير hover على البطاقات
+        document.querySelectorAll('.team-card').forEach(card => {
+            card.addEventListener('mouseenter', function() {
+                this.classList.add('shadow-lg');
+                this.style.transform = 'translateY(-5px)';
+                this.style.transition = 'all 0.3s ease';
+            });
+            
+            card.addEventListener('mouseleave', function() {
+                this.classList.remove('shadow-lg');
+                this.style.transform = 'translateY(0)';
+            });
+        });
+    });
+</script>
+{% endblock %}

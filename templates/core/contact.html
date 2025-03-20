@@ -1,0 +1,204 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}اتصل بنا - شركة الصانع{% endblock %}
+
+{% block content %}
+<!-- فتات الخبز -->
+<nav aria-label="breadcrumb" class="mt-3 mb-4">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="{% url 'core:home' %}">الرئيسية</a></li>
+        <li class="breadcrumb-item active" aria-current="page">اتصل بنا</li>
+    </ol>
+</nav>
+
+<!-- عنوان الصفحة -->
+<div class="row mb-5">
+    <div class="col-12 text-center">
+        <h1 class="display-4 mb-3">اتصل بنا</h1>
+        <p class="lead">نحن هنا للإجابة على استفساراتك وتلبية احتياجاتك</p>
+    </div>
+</div>
+
+<!-- معلومات الاتصال وخريطة جوجل -->
+<div class="row mb-5">
+    <div class="col-lg-6 mb-4 mb-lg-0">
+        <div class="luxury-card p-4 h-100">
+            <h2 class="section-title h4 mb-4">معلومات الاتصال</h2>
+            
+            <div class="d-flex align-items-start mb-4">
+                <div class="contact-icon-wrapper rounded-circle bg-gradient-primary text-white d-flex align-items-center justify-content-center ms-3" style="width: 40px; height: 40px; flex-shrink: 0;">
+                    <i class="fas fa-map-marker-alt"></i>
+                </div>
+                <div>
+                    <h3 class="h6 mb-1">العنوان</h3>
+                    <p class="mb-0">اليمن، صنعاء، شارع جيبوتي</p>
+                </div>
+            </div>
+            
+            <div class="d-flex align-items-start mb-4">
+                <div class="contact-icon-wrapper rounded-circle bg-gradient-primary text-white d-flex align-items-center justify-content-center ms-3" style="width: 40px; height: 40px; flex-shrink: 0;">
+                    <i class="fas fa-phone-alt"></i>
+                </div>
+                <div>
+                    <h3 class="h6 mb-1">رقم الهاتف</h3>
+                    <p class="mb-0">+967 11 123 4567</p>
+                </div>
+            </div>
+            
+            <div class="d-flex align-items-start mb-4">
+                <div class="contact-icon-wrapper rounded-circle bg-gradient-primary text-white d-flex align-items-center justify-content-center ms-3" style="width: 40px; height: 40px; flex-shrink: 0;">
+                    <i class="fas fa-envelope"></i>
+                </div>
+                <div>
+                    <h3 class="h6 mb-1">البريد الإلكتروني</h3>
+                    <p class="mb-0">info@alsanea.com</p>
+                </div>
+            </div>
+            
+            <div class="d-flex align-items-start">
+                <div class="contact-icon-wrapper rounded-circle bg-gradient-gold text-dark d-flex align-items-center justify-content-center ms-3" style="width: 40px; height: 40px; flex-shrink: 0;">
+                    <i class="fas fa-clock"></i>
+                </div>
+                <div>
+                    <h3 class="h6 mb-1">ساعات العمل</h3>
+                    <p class="mb-0">الأحد - الخميس: 8:00 صباحاً - 5:00 مساءً<br>الجمعة - السبت: مغلق</p>
+                </div>
+            </div>
+            
+            <div class="mt-4">
+                <h3 class="h6 mb-3">تابعنا على</h3>
+                <div class="social-links">
+                    <a href="#" aria-label="فيسبوك"><i class="fab fa-facebook-f"></i></a>
+                    <a href="#" aria-label="تويتر"><i class="fab fa-twitter"></i></a>
+                    <a href="#" aria-label="لينكد إن"><i class="fab fa-linkedin-in"></i></a>
+                    <a href="#" aria-label="انستغرام"><i class="fab fa-instagram"></i></a>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-lg-6">
+        <div class="luxury-card p-0 h-100 overflow-hidden">
+            <div class="map-container" style="height: 100%; min-height: 350px;">
+                <!-- تضمين خريطة جوجل -->
+                <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d14488.79227566004!2d46.67243322979837!3d24.713638042663446!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3e2f0336943bf563%3A0xf7a5d4e471dc3154!2z2K3ZiiDYp9mE2LnZhNmK2KfYjCDYp9mE2LHZitin2LYg4oCs!5e0!3m2!1sar!2ssa!4v1631110076418!5m2!1sar!2ssa" width="100%" height="100%" style="border:0;" allowfullscreen="" loading="lazy"></iframe>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- نموذج الاتصال -->
+<div class="row mb-5">
+    <div class="col-12">
+        <div class="luxury-card p-5">
+            <h2 class="section-title section-title-center h4 mb-4">أرسل لنا رسالة</h2>
+            
+            <form method="post" action="" class="row g-3">
+                {% csrf_token %}
+                
+                <div class="col-md-6">
+                    <label for="name" class="form-label">الاسم الكامل *</label>
+                    <input type="text" class="form-control" id="name" name="name" required>
+                </div>
+                
+                <div class="col-md-6">
+                    <label for="email" class="form-label">البريد الإلكتروني *</label>
+                    <input type="email" class="form-control" id="email" name="email" required>
+                </div>
+                
+                <div class="col-md-6">
+                    <label for="phone" class="form-label">رقم الهاتف</label>
+                    <input type="tel" class="form-control" id="phone" name="phone">
+                </div>
+                
+                <div class="col-md-6">
+                    <label for="subject" class="form-label">الموضوع *</label>
+                    <input type="text" class="form-control" id="subject" name="subject" required>
+                </div>
+                
+                <div class="col-12">
+                    <label for="message" class="form-label">الرسالة *</label>
+                    <textarea class="form-control" id="message" name="message" rows="5" required></textarea>
+                </div>
+                
+                <div class="col-12 mt-4">
+                    <button type="submit" class="btn btn-luxury">إرسال الرسالة</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- الأسئلة الشائعة -->
+<div class="row mb-5">
+    <div class="col-12 text-center mb-4">
+        <h2 class="section-title section-title-center h3">الأسئلة الشائعة</h2>
+        <p class="lead">إجابات على الأسئلة الأكثر شيوعاً</p>
+    </div>
+    
+    <div class="col-lg-6 mb-4">
+        <div class="luxury-card p-4">
+            <h3 class="h5">ما هي مجالات عمل شركة الصانع؟</h3>
+            <p>تعمل شركة الصانع في مجالات متعددة تشمل المقاولات العامة، التصميم الهندسي، إدارة المشاريع، الإشراف على التنفيذ، وتقديم الاستشارات الهندسية.</p>
+        </div>
+    </div>
+    
+    <div class="col-lg-6 mb-4">
+        <div class="luxury-card p-4">
+            <h3 class="h5">هل تقدم الشركة خدمات للأفراد أم للشركات فقط؟</h3>
+            <p>تقدم شركة الصانع خدماتها لكل من الأفراد والشركات والجهات الحكومية، حيث نتعامل مع مشاريع من مختلف الأحجام.</p>
+        </div>
+    </div>
+    
+    <div class="col-lg-6 mb-4">
+        <div class="luxury-card p-4">
+            <h3 class="h5">كيف يمكنني طلب عرض سعر لمشروع معين؟</h3>
+            <p>يمكنك التواصل معنا من خلال نموذج الاتصال في هذه الصفحة أو الاتصال بنا مباشرة، وسيقوم فريقنا بالتواصل معك لتحديد تفاصيل المشروع وتقديم عرض سعر مناسب.</p>
+        </div>
+    </div>
+    
+    <div class="col-lg-6 mb-4">
+        <div class="luxury-card p-4">
+            <div class="accordion" id="accordionFAQ">
+                <div class="accordion-item">
+                    <h2 class="accordion-header" id="headingFour">
+                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseFour" aria-expanded="false" aria-controls="collapseFour">
+                            <h3 class="h5">هل تقدمون خدمات خارج اليمن؟</h3>
+                        </button>
+                    </h2>
+                    <div id="collapseFour" class="accordion-collapse collapse" aria-labelledby="headingFour" data-bs-parent="#accordionFAQ">
+                        <div class="accordion-body">
+                            <p>نعم، نقدم خدماتنا في جميع أنحاء اليمن ودول الخليج العربي، ولدينا خبرة في العمل في مشاريع دولية في عدة دول عربية وأجنبية.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- بانر الاتصال السريع -->
+<div class="row">
+    <div class="col-12">
+        <div class="bg-gradient-primary p-5 rounded-lg text-white text-center">
+            <h2 class="h3 mb-3">هل لديك مشروع تريد تنفيذه؟</h2>
+            <p class="lead mb-4">اتصل بنا الآن للحصول على استشارة مجانية</p>
+            <div class="d-flex justify-content-center">
+                <a href="tel:+966111234567" class="btn btn-gold me-3"><i class="fas fa-phone-alt me-2"></i> اتصل بنا</a>
+                <a href="mailto:info@alsanea.com" class="btn btn-outline-light"><i class="fas fa-envelope me-2"></i> راسلنا</a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // تنسيق رقم الهاتف
+    document.getElementById('phone').addEventListener('input', function (e) {
+        var x = e.target.value.replace(/\D/g, '').match(/(\d{0,3})(\d{0,3})(\d{0,4})/);
+        e.target.value = !x[2] ? x[1] : x[1] + ' ' + x[2] + (x[3] ? ' ' + x[3] : '');
+    });
+</script>
+{% endblock %} 

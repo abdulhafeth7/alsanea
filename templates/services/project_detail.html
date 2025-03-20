@@ -1,0 +1,356 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}
+    {% if project %}{{ project.title }}{% else %}تفاصيل المشروع{% endif %} - شركة الصانع
+{% endblock %}
+
+{% block content %}
+<!-- فتات الخبز -->
+<nav aria-label="breadcrumb" class="mt-3 mb-4">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="{% url 'core:home' %}">الرئيسية</a></li>
+        <li class="breadcrumb-item"><a href="{% url 'services:projects_list' %}">المشاريع</a></li>
+        <li class="breadcrumb-item active" aria-current="page">{% if project %}{{ project.title }}{% else %}تفاصيل المشروع{% endif %}</li>
+    </ol>
+</nav>
+
+<div class="row">
+    <!-- تفاصيل المشروع -->
+    <div class="col-lg-8 mb-4">
+        {% if project %}
+        <h1 class="mb-3">{{ project.title }}</h1>
+        <div class="mb-3">
+            {% if project.category %}
+            <span class="badge bg-primary me-2">{{ project.category.name }}</span>
+            {% endif %}
+            {% if project.location %}
+            <span class="badge bg-secondary me-2">{{ project.location.name }}</span>
+            {% endif %}
+            {% if project.completion_date %}
+            <span class="badge bg-success"><i class="fas fa-calendar-check me-1"></i> {{ project.completion_date|date:"Y/m/d" }}</span>
+            {% endif %}
+        </div>
+        
+        {% if project.image %}
+        <img src="{{ project.image.url }}" alt="{{ project.title }}" class="img-fluid rounded mb-4 w-100" style="max-height: 500px; object-fit: cover;">
+        {% endif %}
+        
+        <div class="project-description mb-5">
+            <h2 class="h4 mb-3">وصف المشروع</h2>
+            <div class="bg-light p-4 rounded">
+                {{ project.description|linebreaks }}
+            </div>
+        </div>
+
+        {% if project.features.all %}
+        <div class="project-features mb-5">
+            <h2 class="h4 mb-3">مميزات المشروع</h2>
+            <div class="row">
+                {% for feature in project.features.all %}
+                <div class="col-md-6 mb-3">
+                    <div class="card h-100">
+                        <div class="card-body">
+                            <h3 class="h5 card-title">{{ feature.title }}</h3>
+                            <p class="card-text">{{ feature.description }}</p>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+
+        {% if project.images.all %}
+        <div class="project-gallery mb-5">
+            <h2 class="h4 mb-3">معرض الصور</h2>
+            <div class="row g-3">
+                {% for image in project.images.all %}
+                <div class="col-md-4">
+                    <a href="{{ image.image.url }}" data-lightbox="project-gallery">
+                        <img src="{{ image.image.url }}" alt="{{ image.title }}" class="img-fluid rounded">
+                    </a>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+
+        {% if project.testimonial %}
+        <div class="project-testimonial mb-5">
+            <h2 class="h4 mb-3">رأي العميل</h2>
+            <div class="card bg-light">
+                <div class="card-body">
+                    <blockquote class="blockquote mb-0">
+                        <p><i class="fas fa-quote-right me-2"></i>{{ project.testimonial.content }}</p>
+                        <footer class="blockquote-footer mt-2">{{ project.testimonial.client_name }} - {{ project.testimonial.client_position }}</footer>
+                    </blockquote>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+        
+        {% else %}
+        <!-- محتوى افتراضي في حالة عدم وجود مشروع -->
+        <h1 class="mb-3">مجمع فلل سكنية</h1>
+        <div class="mb-3">
+            <span class="badge bg-primary me-2">سكني</span>
+            <span class="badge bg-secondary me-2">الرياض</span>
+            <span class="badge bg-success"><i class="fas fa-calendar-check me-1"></i> 2022/10/15</span>
+        </div>
+        
+        <img src="{% static 'images/project1.jpg' %}" alt="مجمع فلل سكنية" class="img-fluid rounded mb-4 w-100" style="max-height: 500px; object-fit: cover;">
+        
+        <div class="project-description mb-5">
+            <h2 class="h4 mb-3">وصف المشروع</h2>
+            <div class="bg-light p-4 rounded">
+                <p>يتكون المشروع من إنشاء مجمع سكني فاخر يضم 20 فيلا مستقلة بتصاميم معمارية فريدة على مساحة إجمالية تبلغ 15,000 متر مربع.</p>
+                <p>تم تصميم كل فيلا بأسلوب عصري مع الحفاظ على الطابع المحلي، وتضم كل وحدة سكنية 5 غرف نوم ومساحات معيشة فسيحة وحديقة خاصة ومواقف للسيارات.</p>
+                <p>استخدمت في المشروع أفضل مواد البناء المتوافقة مع معايير الاستدامة، كما تم تزويد المجمع بأنظمة ذكية للتحكم في الإضاءة وتكييف الهواء وأنظمة الأمن والمراقبة.</p>
+            </div>
+        </div>
+
+        <div class="project-features mb-5">
+            <h2 class="h4 mb-3">مميزات المشروع</h2>
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <div class="card h-100">
+                        <div class="card-body">
+                            <h3 class="h5 card-title">تصميم عصري</h3>
+                            <p class="card-text">تصميم معماري فريد يجمع بين الأصالة والحداثة مع مراعاة خصوصية العائلة السعودية.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6 mb-3">
+                    <div class="card h-100">
+                        <div class="card-body">
+                            <h3 class="h5 card-title">مواد صديقة للبيئة</h3>
+                            <p class="card-text">استخدام مواد بناء عالية الجودة وصديقة للبيئة تساهم في توفير الطاقة وتقليل الانبعاثات الكربونية.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6 mb-3">
+                    <div class="card h-100">
+                        <div class="card-body">
+                            <h3 class="h5 card-title">أنظمة ذكية</h3>
+                            <p class="card-text">تجهيز الفلل بأحدث أنظمة المنازل الذكية للتحكم في الإضاءة والتكييف والأمن.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6 mb-3">
+                    <div class="card h-100">
+                        <div class="card-body">
+                            <h3 class="h5 card-title">مساحات خضراء</h3>
+                            <p class="card-text">توفير مساحات خضراء واسعة داخل المجمع تشمل حدائق عامة وملاعب للأطفال ومسارات للمشي.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="project-gallery mb-5">
+            <h2 class="h4 mb-3">معرض الصور</h2>
+            <div class="row g-3">
+                <div class="col-md-4">
+                    <a href="{% static 'images/project1-1.jpg' %}" data-lightbox="project-gallery">
+                        <img src="{% static 'images/project1-1.jpg' %}" alt="صورة المشروع 1" class="img-fluid rounded">
+                    </a>
+                </div>
+                <div class="col-md-4">
+                    <a href="{% static 'images/project1-2.jpg' %}" data-lightbox="project-gallery">
+                        <img src="{% static 'images/project1-2.jpg' %}" alt="صورة المشروع 2" class="img-fluid rounded">
+                    </a>
+                </div>
+                <div class="col-md-4">
+                    <a href="{% static 'images/project1-3.jpg' %}" data-lightbox="project-gallery">
+                        <img src="{% static 'images/project1-3.jpg' %}" alt="صورة المشروع 3" class="img-fluid rounded">
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <div class="project-testimonial mb-5">
+            <h2 class="h4 mb-3">رأي العميل</h2>
+            <div class="card bg-light">
+                <div class="card-body">
+                    <blockquote class="blockquote mb-0">
+                        <p><i class="fas fa-quote-right me-2"></i>لقد تعاملنا مع شركة الصانع لتنفيذ مشروع المجمع السكني، وكان مستوى الاحترافية والدقة في التنفيذ مذهلاً. تم تسليم المشروع في الوقت المحدد وبجودة تفوق توقعاتنا.</p>
+                        <footer class="blockquote-footer mt-2">شركة الاستثمارات العقارية المتحدة</footer>
+                    </blockquote>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+    
+    <!-- القائمة الجانبية -->
+    <div class="col-lg-4">
+        <!-- بيانات المشروع -->
+        <div class="card mb-4">
+            <div class="card-header bg-primary text-white">
+                <h3 class="h5 mb-0">بيانات المشروع</h3>
+            </div>
+            <div class="card-body">
+                <ul class="list-unstyled mb-0">
+                    {% if project %}
+                    {% if project.client_name %}
+                    <li class="mb-2"><strong>العميل:</strong> {{ project.client_name }}</li>
+                    {% endif %}
+                    {% if project.area %}
+                    <li class="mb-2"><strong>المساحة:</strong> {{ project.area }} م<sup>2</sup></li>
+                    {% endif %}
+                    {% if project.duration %}
+                    <li class="mb-2"><strong>مدة التنفيذ:</strong> {{ project.duration }} شهر</li>
+                    {% endif %}
+                    {% if project.start_date %}
+                    <li class="mb-2"><strong>تاريخ البدء:</strong> {{ project.start_date|date:"Y/m/d" }}</li>
+                    {% endif %}
+                    {% if project.completion_date %}
+                    <li class="mb-2"><strong>تاريخ الانتهاء:</strong> {{ project.completion_date|date:"Y/m/d" }}</li>
+                    {% endif %}
+                    {% if project.budget %}
+                    <li class="mb-2"><strong>التكلفة التقديرية:</strong> {{ project.budget }} ريال</li>
+                    {% endif %}
+                    
+                    {% else %}
+                    <!-- بيانات افتراضية في حالة عدم وجود مشروع -->
+                    <li class="mb-2"><strong>العميل:</strong> شركة الاستثمارات العقارية المتحدة</li>
+                    <li class="mb-2"><strong>المساحة:</strong> 15,000 م<sup>2</sup></li>
+                    <li class="mb-2"><strong>مدة التنفيذ:</strong> 18 شهر</li>
+                    <li class="mb-2"><strong>تاريخ البدء:</strong> 2021/04/01</li>
+                    <li class="mb-2"><strong>تاريخ الانتهاء:</strong> 2022/10/15</li>
+                    <li class="mb-2"><strong>التكلفة التقديرية:</strong> 25,000,000 ريال</li>
+                    {% endif %}
+                </ul>
+            </div>
+        </div>
+        
+        <!-- الخدمات المقدمة في المشروع -->
+        <div class="card mb-4">
+            <div class="card-header bg-primary text-white">
+                <h3 class="h5 mb-0">الخدمات المقدمة</h3>
+            </div>
+            <div class="card-body">
+                <ul class="list-group list-group-flush">
+                    {% if project and project.services.all %}
+                    {% for service in project.services.all %}
+                    <li class="list-group-item">
+                        <a href="{% url 'services:service_detail' service.slug %}" class="text-decoration-none">
+                            <i class="fas fa-check-circle text-success me-2"></i> {{ service.title }}
+                        </a>
+                    </li>
+                    {% endfor %}
+                    {% else %}
+                    <!-- خدمات افتراضية في حالة عدم وجود خدمات متصلة بالمشروع -->
+                    <li class="list-group-item">
+                        <i class="fas fa-check-circle text-success me-2"></i> التصميم المعماري
+                    </li>
+                    <li class="list-group-item">
+                        <i class="fas fa-check-circle text-success me-2"></i> التصميم الإنشائي
+                    </li>
+                    <li class="list-group-item">
+                        <i class="fas fa-check-circle text-success me-2"></i> الإشراف على التنفيذ
+                    </li>
+                    <li class="list-group-item">
+                        <i class="fas fa-check-circle text-success me-2"></i> أعمال التشطيبات
+                    </li>
+                    <li class="list-group-item">
+                        <i class="fas fa-check-circle text-success me-2"></i> تنسيق المواقع والحدائق
+                    </li>
+                    {% endif %}
+                </ul>
+            </div>
+        </div>
+
+        <!-- مشاريع مشابهة -->
+        <div class="card mb-4">
+            <div class="card-header bg-primary text-white">
+                <h3 class="h5 mb-0">مشاريع مشابهة</h3>
+            </div>
+            <div class="card-body p-0">
+                <ul class="list-group list-group-flush">
+                    {% if related_projects %}
+                    {% for related in related_projects %}
+                    <li class="list-group-item">
+                        <div class="d-flex">
+                            {% if related.image %}
+                            <img src="{{ related.image.url }}" alt="{{ related.title }}" class="me-3" style="width: 70px; height: 50px; object-fit: cover;">
+                            {% else %}
+                            <div class="bg-light me-3 d-flex align-items-center justify-content-center" style="width: 70px; height: 50px;">
+                                <i class="fas fa-building"></i>
+                            </div>
+                            {% endif %}
+                            <div>
+                                <h4 class="h6 mb-1">{{ related.title }}</h4>
+                                <a href="{% url 'services:project_detail' related.slug %}" class="btn btn-sm btn-outline-primary">عرض المشروع</a>
+                            </div>
+                        </div>
+                    </li>
+                    {% endfor %}
+                    {% else %}
+                    <!-- مشاريع افتراضية في حالة عدم وجود مشاريع مشابهة -->
+                    <li class="list-group-item">
+                        <div class="d-flex">
+                            <div class="bg-light me-3 d-flex align-items-center justify-content-center" style="width: 70px; height: 50px;">
+                                <i class="fas fa-building"></i>
+                            </div>
+                            <div>
+                                <h4 class="h6 mb-1">مجمع سكني - الرياض</h4>
+                                <a href="#" class="btn btn-sm btn-outline-primary">عرض المشروع</a>
+                            </div>
+                        </div>
+                    </li>
+                    <li class="list-group-item">
+                        <div class="d-flex">
+                            <div class="bg-light me-3 d-flex align-items-center justify-content-center" style="width: 70px; height: 50px;">
+                                <i class="fas fa-building"></i>
+                            </div>
+                            <div>
+                                <h4 class="h6 mb-1">فلل فاخرة - جدة</h4>
+                                <a href="#" class="btn btn-sm btn-outline-primary">عرض المشروع</a>
+                            </div>
+                        </div>
+                    </li>
+                    <li class="list-group-item">
+                        <div class="d-flex">
+                            <div class="bg-light me-3 d-flex align-items-center justify-content-center" style="width: 70px; height: 50px;">
+                                <i class="fas fa-building"></i>
+                            </div>
+                            <div>
+                                <h4 class="h6 mb-1">مجمع سكني - الدمام</h4>
+                                <a href="#" class="btn btn-sm btn-outline-primary">عرض المشروع</a>
+                            </div>
+                        </div>
+                    </li>
+                    {% endif %}
+                </ul>
+            </div>
+        </div>
+
+        <!-- احصل على استشارة -->
+        <div class="card bg-light mb-4">
+            <div class="card-body text-center p-4">
+                <h3 class="h5 mb-3">هل تخطط لمشروع مماثل؟</h3>
+                <p>تواصل معنا للحصول على استشارة مجانية وعرض سعر مناسب لمشروعك</p>
+                <a href="{% url 'core:contact' %}" class="btn btn-primary">طلب استشارة</a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/lightbox2/2.11.3/css/lightbox.min.css">
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/lightbox2/2.11.3/js/lightbox.min.js"></script>
+<script>
+    // تهيئة Lightbox
+    lightbox.option({
+        'resizeDuration': 200,
+        'wrapAround': true,
+        'albumLabel': "صورة %1 من %2"
+    });
+</script>
+{% endblock %} 
