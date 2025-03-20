@@ -110,4 +110,55 @@ document.addEventListener('DOMContentLoaded', function() {
             countdownElement.innerHTML = `${days} يوم ${hours} ساعة ${minutes} دقيقة ${seconds} ثانية`;
         }, 1000);
     }
+
+    // تحسين تجربة شريط التنقل في الهواتف المحمولة
+    // إضافة تأثير عند النقر على زر القائمة المنسدلة
+    const navbarToggler = document.querySelector('.navbar-toggler');
+    if (navbarToggler) {
+        navbarToggler.addEventListener('click', function() {
+            this.classList.toggle('active');
+        });
+    }
+    
+    // إغلاق القائمة عند النقر على أي رابط
+    const navLinks = document.querySelectorAll('.navbar-nav .nav-link');
+    const navbarCollapse = document.querySelector('.navbar-collapse');
+    
+    if (navLinks && navbarCollapse) {
+        navLinks.forEach(link => {
+            link.addEventListener('click', () => {
+                // تحقق من أن القائمة مفتوحة وأننا في واجهة الجوال
+                if (window.innerWidth < 992 && navbarCollapse.classList.contains('show')) {
+                    // استخدام API الخاص بـ Bootstrap لإغلاق القائمة
+                    const bootstrap = window.bootstrap;
+                    if (bootstrap) {
+                        const bsCollapse = new bootstrap.Collapse(navbarCollapse);
+                        bsCollapse.hide();
+                    } else {
+                        // البديل في حالة عدم توفر API
+                        navbarCollapse.classList.remove('show');
+                    }
+                    
+                    // إزالة الفئة النشطة من زر القائمة
+                    if (navbarToggler) {
+                        navbarToggler.classList.remove('active');
+                        navbarToggler.setAttribute('aria-expanded', 'false');
+                    }
+                }
+            });
+        });
+    }
+    
+    // تغيير مظهر شريط التنقل عند التمرير
+    const handleScroll = () => {
+        const navbar = document.getElementById('main-header');
+        if (navbar && window.scrollY > 50) {
+            navbar.classList.add('navbar-scrolled');
+        } else if (navbar) {
+            navbar.classList.remove('navbar-scrolled');
+        }
+    };
+    
+    window.addEventListener('scroll', handleScroll);
+    handleScroll(); // تطبيق عند التحميل الأولي
 }); 
