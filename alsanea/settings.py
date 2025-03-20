@@ -14,27 +14,23 @@ import os
 from pathlib import Path
 from decouple import config, Csv
 import dj_database_url
-import environ
+from dotenv import load_dotenv
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-env = environ.Env()
-
-# إذا كان ملف .env موجوداً، قم بقراءته
-if os.path.exists(".env"):
-    environ.Env.read_env(".env")
+load_dotenv()
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/3.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = env("DJANGO_SECRET_KEY", default="your-default-key-here")
+SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY', default="your-default-key-here")
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = env.bool("DJANGO_DEBUG", default=False)
+DEBUG = os.environ.get('DJANGO_DEBUG', default=False)
 
-ALLOWED_HOSTS = env.list("DJANGO_ALLOWED_HOSTS", default=["localhost", "127.0.0.1"])
+ALLOWED_HOSTS = os.environ.get('DJANGO_ALLOWED_HOSTS', default=["localhost", "127.0.0.1"])
 
 
 # Application definition
@@ -106,7 +102,7 @@ WSGI_APPLICATION = 'alsanea.wsgi.application'
 # https://docs.djangoproject.com/en/3.2/ref/settings/#databases
 
 DATABASES = {
-    'default': env.db("DATABASE_URL", default="sqlite:///db.sqlite3")
+    'default': os.environ.get('DATABASE_URL', default="sqlite:///db.sqlite3")
 }
 
 
